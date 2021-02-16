@@ -1,0 +1,16 @@
+table {
+    /* background-color: black; */
+    padding: 5px
+}
+
+table, th, td {
+    color: black;
+    border: 1px solid black;
+    text-align: center; 
+    vertical-align: middle;    
+}
+
+.scores {
+    font-size: 24px;
+    font-weight:700;
+}
