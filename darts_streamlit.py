@@ -122,8 +122,8 @@ def new_game(turns,
                 print("I Win! Great Game! Turns: "+str(turns+1))
                 print("Skill:", generalspread)
                 st.title("I Win! Great Game! Turns: "+str(turns+1))
-                st.title(f"Skill Player 0: {generalspread[0]}")
-                st.title(f"Skill Player 1: {generalspread[1]}")
+                st.title(f"Skill Player 0: {generalspread[0][0]}")
+                st.title(f"Skill Player 1: {generalspread[1][0]}")
                 
                 st.balloons()
                 end_of_game = True
