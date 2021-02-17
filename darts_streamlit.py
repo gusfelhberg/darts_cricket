@@ -28,7 +28,7 @@ def get_dart_count_string(num_darts):
     return ''.join([':dart:' for x in range(int(num_darts))])
 
 
-def draw_board(results, current_score):
+def draw_board(results, current_score, col):
     # results: 2 dimention arrays. Each dimensions contains the number of hits. The last position of the array is the current score
     # Example:
     # results = [[3,2,3,0,0,0,0,0,100],  --> Player 0
@@ -49,7 +49,7 @@ def draw_board(results, current_score):
     | {get_dart_count_string(results[0][8])} | Double | {get_dart_count_string(results[1][8])} |
     |  <span class="scores">{int(current_score[0][0])}</span>  | <span class="scores">SCORE</span>   |  <span class="scores">{int(current_score[1][0])}</span>  |
     '''
-    st.sidebar.markdown(table, unsafe_allow_html=True)
+    col.markdown(table, unsafe_allow_html=True)
 
 
 def new_game(turns, 
@@ -81,12 +81,12 @@ def new_game(turns,
         st.write('---')
         st.write('### PLAYER '+str(player)+' - Turn: '+str(turns+1))
 
-        cols = st.beta_columns(3)
+        cols = st.beta_columns(2)
 
         for i in range(1, 4):
             aiming_for, aiming_for_mult = Decide(
                 player, completed, scoring, highest_score, triples, doubles)  # DECISION -> Replace with RL
-            cols[i-1].write("Aiming At: "+str(aiming_for) +
+            cols[0].write("Aiming At: "+str(aiming_for) +
                             "*"+str(aiming_for_mult))
 
             # AIM -> Consoder (x,y) policy instead?
@@ -98,7 +98,7 @@ def new_game(turns,
                 arrow_x, arrow_y)  # DART SCORE
 
             print(comment+" "+str(dartscore)+"*"+str(darts_core_mult))
-            cols[i-1].write(comment+" "+str(dartscore) +
+            cols[0].write(comment+" "+str(dartscore) +
                             "*"+str(darts_core_mult))
 
             board, current_score, game_end, completed, scoring, highest_score, triples, doubles,  darts_to_finish, max_poss_scoring, fewer_remaining = BoardUpdate(
@@ -153,12 +153,12 @@ def new_game(turns,
                 # sys.exit()
 
         # st.write(current_score)
-        # draw_board(board,current_score)
+        draw_board(board,current_score,cols[1])
 
         player = 1 - player
         turns = turns + 1
 
-    draw_board(board, current_score)
+    # draw_board(board, current_score)
 
 
 
