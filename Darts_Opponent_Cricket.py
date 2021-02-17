@@ -19,6 +19,9 @@ import matplotlib.cbook as cbook
 from imageio import imread
 import sys
 
+import streamlit as st
+st.set_option('deprecation.showPyplotGlobalUse', False)
+
 
 ######################################################
 # BOARD & ARRAY SETUP #
@@ -735,7 +738,7 @@ def BoardUpdate(board, player, current_score, dartscore, darts_core_mult, highes
     # WHAT DOES THE DARTBOARD LOOK LIKE? #
 ######################################################
 
-def BoardViz(arrow_x, arrow_y, i):
+def BoardViz(arrow_x, arrow_y, i,col):
     x = 0
     y = 0
 
@@ -751,17 +754,18 @@ def BoardViz(arrow_x, arrow_y, i):
     datafile2 = './chalkboard.jpg'
     img2 = imread(datafile2)
     # datafile3 = cbook.get_sample_data('./dart.bmp')
-    datafile3 = './dart.bmp'
+    datafile3 = './dart.png'
     img3 = imread(datafile3)
 
     # plt.scatter(x,y,zorder=2)
     plt.axis('off')
     plt.imshow(img3, zorder=2, extent=[x-.39, x+.61, y-.9, y+.05])  # DART
-    plt.imshow(img2, zorder=1, extent=[8.5, 10, 0, 2])  # CHALK BOARD
+    # plt.imshow(img2, zorder=1, extent=[8.5, 10, 0, 2])  # CHALK BOARD
     plt.imshow(img, zorder=0, extent=[0, 10, 0, 10])  # DARTBOARD
 
-    if i == 3:
-        plt.show()
+    # if i == 3:
+        # plt.show()
+    col.pyplot()
 
     # print(x,y)
 

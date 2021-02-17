@@ -1,17 +1,5 @@
 from Darts_Opponent_Cricket import Accuracy, Throw, Score, Aim, Decide, BoardViz, Skill, GameReset, BoardUpdate
 import streamlit as st
-from streamlit.hashing import _CodeHasher
-import sys
-
-try:
-    # Before Streamlit 0.65
-    from streamlit.ReportThread import get_report_ctx
-    from streamlit.server.Server import Server
-except ModuleNotFoundError:
-    # After Streamlit 0.65
-    from streamlit.report_thread import get_report_ctx
-    from streamlit.server.server import Server
-
 
 import numpy as np
 # from Darts_Opponent_Cricket import *
@@ -81,12 +69,12 @@ def new_game(turns,
         st.write('---')
         st.write('### PLAYER '+str(player)+' - Turn: '+str(turns+1))
 
-        cols = st.beta_columns(2)
+        cols = st.beta_columns(4)
 
         for i in range(1, 4):
             aiming_for, aiming_for_mult = Decide(
                 player, completed, scoring, highest_score, triples, doubles)  # DECISION -> Replace with RL
-            cols[0].write("Aiming At: "+str(aiming_for) +
+            cols[i-1].write("Aiming At: "+str(aiming_for) +
                             "*"+str(aiming_for_mult))
 
             # AIM -> Consoder (x,y) policy instead?
@@ -98,8 +86,10 @@ def new_game(turns,
                 arrow_x, arrow_y)  # DART SCORE
 
             print(comment+" "+str(dartscore)+"*"+str(darts_core_mult))
-            cols[0].write(comment+" "+str(dartscore) +
+            cols[i-1].write(comment+" "+str(dartscore) +
                             "*"+str(darts_core_mult))
+            
+            BoardViz(arrow_x, arrow_y, i, cols[i-1])
 
             board, current_score, game_end, completed, scoring, highest_score, triples, doubles,  darts_to_finish, max_poss_scoring, fewer_remaining = BoardUpdate(
                 board, player, current_score, dartscore, darts_core_mult, highest_score, completed, game_end, darts_to_finish, max_poss_scoring, fewer_remaining, scoring, triples, doubles)  # UPDATE variables after throw
@@ -118,7 +108,7 @@ def new_game(turns,
                 print(board)
                 print(current_score)
                 print(game_end)
-                BoardViz(arrow_x, arrow_y, i)
+                # BoardViz(arrow_x, arrow_y, i)
                 print("I Win! Great Game! Turns: "+str(turns+1))
                 print("Skill:", generalspread)
                 st.title("I Win! Great Game! Turns: "+str(turns+1))
@@ -136,7 +126,7 @@ def new_game(turns,
                 print(board)
                 print(current_score)
                 print(game_end)
-                BoardViz(arrow_x, arrow_y, i)
+                # BoardViz(arrow_x, arrow_y, i)
                 print("You Win! Great Game! Turns: "+str(turns+1))
                 print("Skill:", generalspread)
                 st.title("You Win! Great Game! Turns: "+str(turns+1))
@@ -149,11 +139,8 @@ def new_game(turns,
         if end_of_game:
             break
 
-
-                # sys.exit()
-
-        # st.write(current_score)
-        draw_board(board,current_score,cols[1])
+        draw_board(board,current_score,cols[3])
+        
 
         player = 1 - player
         turns = turns + 1
