@@ -74,11 +74,9 @@ def new_game(turns,
 
         print('')
         print('##### PLAYER '+str(player))
-        st.write('---')
-
-
 
         if player == 0:
+            st.write('---')
             cols_player = st.beta_columns([1,1,1,2,1,1,1])
             cols_player[0].write('### Turn: '+str(turns+1))
             cols_player[4].write('### Turn: '+str(turns+2))            

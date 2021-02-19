@@ -21,7 +21,7 @@ import sys
 
 import streamlit as st
 st.set_option('deprecation.showPyplotGlobalUse', False)
-from images import *
+# from images import *
 
 
 ######################################################
