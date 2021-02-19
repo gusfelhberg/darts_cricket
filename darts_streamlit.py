@@ -78,8 +78,8 @@ def new_game(turns,
         if player == 0:
             st.write('---')
             cols_player = st.beta_columns([1,1,1,2,1,1,1])
-            cols_player[0].write('### Turn: '+str(turns+1))
-            cols_player[4].write('### Turn: '+str(turns+2))            
+            cols_player[1].markdown(f'### Turn: {str(turns+1)}')
+            cols_player[5].markdown(f'### Turn: {str(turns+2)}')            
             cols = st.beta_columns([1,1,1,2,1,1,1])
 
         for i in range(1, 4):
