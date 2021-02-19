@@ -35,9 +35,11 @@ def draw_board(results, current_score, col):
     | {get_dart_count_string(results[0][6])} | Bullseye | {get_dart_count_string(results[1][6])} |
     | {get_dart_count_string(results[0][7])} | Triple | {get_dart_count_string(results[1][7])} |
     | {get_dart_count_string(results[0][8])} | Double | {get_dart_count_string(results[1][8])} |
-    |  <span class="scores">{int(current_score[0][0])}</span>  | <span class="scores">SCORE</span>   |  <span class="scores">{int(current_score[1][0])}</span>  |
+    |  <span class="scores">{int(current_score[0])}</span>  | <span class="scores">SCORE</span>   |  <span class="scores">{int(current_score[1])}</span>  |
     '''
+    col.markdown('<center>', unsafe_allow_html=True)
     col.markdown(table, unsafe_allow_html=True)
+    col.markdown('</center>', unsafe_allow_html=True)
 
 
 def new_game(turns, 
@@ -57,58 +59,72 @@ def new_game(turns,
              entryscore):
 
     player = 0
+    
+    overall_score=[0,0]
 
     end_of_game = False
+    
+    cols_title = st.beta_columns([3,1,3])
+    cols_title[0].title('Player 0')
+    cols_title[2].title('Player 1')
 
-    while game_end[0, 0] == 0 or turns < 100 or game_end[0, 0] == 1 or game_end[1, 0] == 1:
+    while game_end[0, 0] == 0:
 
         i = 1
 
         print('')
         print('##### PLAYER '+str(player))
         st.write('---')
-        st.write('### PLAYER '+str(player)+' - Turn: '+str(turns+1))
 
-        cols = st.beta_columns(4)
+
+
+        if player == 0:
+            cols_player = st.beta_columns([1,1,1,2,1,1,1])
+            cols_player[0].write('### Turn: '+str(turns+1))
+            cols_player[4].write('### Turn: '+str(turns+2))            
+            cols = st.beta_columns([1,1,1,2,1,1,1])
 
         for i in range(1, 4):
             aiming_for, aiming_for_mult = Decide(
                 player, completed, scoring, highest_score, triples, doubles)  # DECISION -> Replace with RL
-            cols[i-1].write("Aiming At: "+str(aiming_for) +
-                            "*"+str(aiming_for_mult))
+            if player == 0:
+                cols[i-1].write("Aiming At: "+str(aiming_for) +"*"+str(aiming_for_mult))
+            else:
+                cols[i+4-1].write("Aiming At: "+str(aiming_for) +"*"+str(aiming_for_mult))                
 
             # AIM -> Consoder (x,y) policy instead?
             aiming_arrow_x, aiming_arrow_y = Aim(aiming_for, aiming_for_mult)
             nowspread = Accuracy(player, generalspread)  # SKILL/FOCUS/LUCK
-            arrow_x, arrow_y = Throw(
-                aiming_arrow_x, aiming_arrow_y, nowspread)  # THROW/LAND
-            dartscore, darts_core_mult, comment = Score(
-                arrow_x, arrow_y)  # DART SCORE
+            arrow_x, arrow_y = Throw(aiming_arrow_x, aiming_arrow_y, nowspread)  # THROW/LAND
+            dartscore, darts_core_mult, comment = Score(arrow_x, arrow_y)  # DART SCORE
+            
+            # overall_score[player] = overall_score[player] + dartscore * darts_core_mult
 
             print(comment+" "+str(dartscore)+"*"+str(darts_core_mult))
-            cols[i-1].write(comment+" "+str(dartscore) +
-                            "*"+str(darts_core_mult))
+            if player == 0:
+                cols[i-1].write(comment+" "+str(dartscore) + "*"+str(darts_core_mult))
+            else:
+                cols[i+4-1].write(comment+" "+str(dartscore) + "*"+str(darts_core_mult))
             
-            BoardViz(arrow_x, arrow_y, i, cols[i-1])
-
             board, current_score, game_end, completed, scoring, highest_score, triples, doubles,  darts_to_finish, max_poss_scoring, fewer_remaining = BoardUpdate(
                 board, player, current_score, dartscore, darts_core_mult, highest_score, completed, game_end, darts_to_finish, max_poss_scoring, fewer_remaining, scoring, triples, doubles)  # UPDATE variables after throw
 
-            # st.write(board)
-            # complete_board[player] = board
-            # complete_board = board
+            if player == 0:
+                BoardViz(arrow_x, arrow_y, i, cols[i-1])
+            else:
+                BoardViz(arrow_x, arrow_y, i, cols[i+4-1])
+            
+            if player == 0:
+                cols[i-1].write(f'Score: {current_score[player][0]}')
+            else:
+                cols[i+4-1].write(f'Score: {current_score[player][0]}')
 
-            ##############
-            #ADD DARTBOARD ANIMATION AFTER EACH TURN BACK WHEN PLAYING AGAINST HUMAN ##
-            # Board(arrow_x,arrow_y,i)
-            ##############
 
             if game_end[0, 0] == 1:
                 turns = turns + 1
                 print(board)
                 print(current_score)
                 print(game_end)
-                # BoardViz(arrow_x, arrow_y, i)
                 print("I Win! Great Game! Turns: "+str(turns+1))
                 print("Skill:", generalspread)
                 st.title("I Win! Great Game! Turns: "+str(turns+1))
@@ -136,14 +152,36 @@ def new_game(turns,
                 end_of_game = True
                 break
         
-        if end_of_game:
-            break
 
-        draw_board(board,current_score,cols[3])
+        if player == 1:
+            draw_board(board,current_score,cols[3])
+
+        # st.write(f'')
+        # st.write(f'Darts to Finish: {darts_to_finish[player][0]}')
         
+
+
+        # st.write('Board: '+str(board[player]))
+        # st.write('Score: '+str(current_score[player]))
+        # if scoring[0][0] > scoring[1][0]:
+        #     st.write('Player 0 is leading')
+        # elif scoring[0][0] < scoring[1][0]:
+        #     st.write('Player 1 is leading')
+        # else:
+        #     st.write('Players with same score')
+        
+        # st.write('Completed: '+str(completed[player]))
+        # st.write('Scoring: '+str(scoring[player]))
+        # st.write('Darts to Finish: '+str(darts_to_finish[player]))
+        # st.write('Fewer remaining: '+str(fewer_remaining[player]))
+        # st.write('Max Poss. Scoring Left: '+str(
+        #     current_score[player])+'-'+str(current_score[1-player])+' / '+str(max_poss_scoring[player]))        
 
         player = 1 - player
         turns = turns + 1
+        
+        if end_of_game:
+            break
 
     # draw_board(board, current_score)
 

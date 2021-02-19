@@ -21,6 +21,7 @@ import sys
 
 import streamlit as st
 st.set_option('deprecation.showPyplotGlobalUse', False)
+from images import *
 
 
 ######################################################
@@ -211,8 +212,8 @@ def Throw(aiming_arrow_x, aiming_arrow_y, nowspread):
 ######################################################
 
 def Score(arrow_x, arrow_y):
-    dartscore = 0
-    darts_core_mult = 0
+    dart_score = 0
+    dart_score_mult = 0
     distance = 0
     comment = "Hit!"
 
@@ -226,408 +227,186 @@ def Score(arrow_x, arrow_y):
     #print("d: "+str(distance)+" a: "+str(angle))
 
 
-######################
-# Miss / Wire / Bull #
-######################
+    ######################
+    # Miss / Wire / Bull #
+    ######################
 
-### Miss Board ###
+    ### Miss Board ###
     if distance > 144:
-        dartscore = 0
-        darts_core_mult = 0
+        dart_score = 0
+        dart_score_mult = 0
         comment = "Backboard!"
-        return dartscore, darts_core_mult, comment
+        return dart_score, dart_score_mult, comment
 
-### Wire Shots ###
+    ### Wire Shots ###
     wireshotbounce = 0.2
     if np.round(distance, 0) in [10, 20, 74, 84, 134, 144]:
         if random() < wireshotbounce:
-            dartscore = 0
-            darts_core_mult = 0
+            dart_score = 0
+            dart_score_mult = 0
             comment = "Bounced!"
-            return dartscore, darts_core_mult, comment
+            return dart_score, dart_score_mult, comment
 
     if np.round(angle, 0) in [9, 27, 45, 63, 81, 99, 117, 135, 153, 171, 189, 207, 225, 243, 261, 279, 297, 315, 333, 351]:
         if random() < wireshotbounce:
-            dartscore = 0
-            darts_core_mult = 0
+            dart_score = 0
+            dart_score_mult = 0
             comment = "Bounced!"
-            return dartscore, darts_core_mult, comment
+            return dart_score, dart_score_mult, comment
 
     if distance < 10:
-        dartscore = 25
-        darts_core_mult = 2
+        dart_score = 25
+        dart_score_mult = 2
         comment = "Double Bull!"
-        return dartscore, darts_core_mult, comment
+        return dart_score, dart_score_mult, comment
 
     if distance < 20:
-        dartscore = 25
-        darts_core_mult = 1
+        dart_score = 25
+        dart_score_mult = 1
         comment = "Single Bull!"
-        return dartscore, darts_core_mult, comment
+        return dart_score, dart_score_mult, comment
 
-######################
-        # 20...1 #
-######################
-#
-# 20
-    if 81 <= angle < 99:
-        if 74 < distance <= 84:
-            dartscore = 20
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 20
-                darts_core_mult = 2
-            else:
-                dartscore = 20
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 5
-    if 99 <= angle < 117:
-        if 74 < distance <= 84:
-            dartscore = 5
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 5
-                darts_core_mult = 2
-            else:
-                dartscore = 5
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 12
-    if 117 <= angle < 135:
-        if 74 < distance <= 84:
-            dartscore = 12
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 12
-                darts_core_mult = 2
-            else:
-                dartscore = 12
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 9
-    if 135 <= angle < 153:
-        if 74 < distance <= 84:
-            dartscore = 9
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 9
-                darts_core_mult = 2
-            else:
-                dartscore = 9
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 14
-    if 153 <= angle < 171:
-        if 74 < distance <= 84:
-            dartscore = 14
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 14
-                darts_core_mult = 2
-            else:
-                dartscore = 14
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 11
-    if 171 <= angle < 189:
-        if 74 < distance <= 84:
-            dartscore = 11
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 11
-                darts_core_mult = 2
-            else:
-                dartscore = 11
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 8
-    if 189 <= angle < 207:
-        if 74 < distance <= 84:
-            dartscore = 8
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 8
-                darts_core_mult = 2
-            else:
-                dartscore = 8
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 16
-    if 207 <= angle < 225:
-        if 74 < distance <= 84:
-            dartscore = 16
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 16
-                darts_core_mult = 2
-            else:
-                dartscore = 16
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 7
-    if 225 <= angle < 243:
-        if 74 < distance <= 84:
-            dartscore = 7
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 7
-                darts_core_mult = 2
-            else:
-                dartscore = 7
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 19
-    if 243 <= angle < 261:
-        if 74 < distance <= 84:
-            dartscore = 19
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 19
-                darts_core_mult = 2
-            else:
-                dartscore = 19
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 3
-    if 261 <= angle < 279:
-        if 74 < distance <= 84:
-            dartscore = 3
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 3
-                darts_core_mult = 2
-            else:
-                dartscore = 3
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 17
-    if 279 <= angle < 297:
-        if 74 < distance <= 84:
-            dartscore = 17
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 17
-                darts_core_mult = 2
-            else:
-                dartscore = 17
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 2
-    if 297 <= angle < 315:
-        if 74 < distance <= 84:
-            dartscore = 2
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 2
-                darts_core_mult = 2
-            else:
-                dartscore = 2
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 15
-    if 315 <= angle < 333:
-        if 74 < distance <= 84:
-            dartscore = 15
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 15
-                darts_core_mult = 2
-            else:
-                dartscore = 15
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 10
-    if 333 <= angle < 351:
-        if 74 < distance <= 84:
-            dartscore = 10
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 10
-                darts_core_mult = 2
-            else:
-                dartscore = 10
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 6
-    if (351 <= angle < 361) or (0 <= angle < 9):
-        if 74 < distance <= 84:
-            dartscore = 6
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 6
-                darts_core_mult = 2
-            else:
-                dartscore = 6
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 13
-    if 9 <= angle < 27:
-        if 74 < distance <= 84:
-            dartscore = 13
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 13
-                darts_core_mult = 2
-            else:
-                dartscore = 13
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 4
-    if 27 <= angle < 45:
-        if 74 < distance <= 84:
-            dartscore = 4
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 4
-                darts_core_mult = 2
-            else:
-                dartscore = 4
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 18
-    if 45 <= angle < 63:
-        if 74 < distance <= 84:
-            dartscore = 18
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 18
-                darts_core_mult = 2
-            else:
-                dartscore = 18
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
-# 1
-    if 63 <= angle < 81:
-        if 74 < distance <= 84:
-            dartscore = 1
-            darts_core_mult = 3
-        else:
-            if 134 < distance <= 144:
-                dartscore = 1
-                darts_core_mult = 2
-            else:
-                dartscore = 1
-                darts_core_mult = 1
-        return dartscore, darts_core_mult, comment
+    ######################
+            # 20...1 #
+    ######################
+    triple_distance_limit_lower = 74
+    triple_distance_limit_upper = 84
+    double_distance_limit_lower = 134
+    double_distance_limit_upper = 144
+    
+    angles_distances_array = [
+        #[angle_start, angle_end, score]
+        [0,     9,  6],    # 6 (part 1 of 2)
+        [9,    27, 13],    # 13
+        [27,   45,  4],    # 4
+        [45,   63, 18],    # 18
+        [63,   81,  1],    # 1
+        [81,   99, 20],    # 20
+        [99,  117,  5],    # 5
+        [117, 135, 12],    # 12
+        [135, 153,  9],    # 9
+        [153, 171, 14],    # 14
+        [171, 189, 11],    # 11
+        [189, 207,  8],    # 8
+        [207, 225, 16],    # 16
+        [255, 243,  7],    # 7
+        [243, 261, 19],    # 19
+        [261, 279,  3],    # 3
+        [279, 297, 17],    # 17
+        [297, 315,  2],    # 2
+        [315, 333, 15],    # 15
+        [333, 351, 10],    # 10
+        [351, 361,  6]     # 6 (part 1 of 2)
+    ] 
 
-    dartscore = 999
-    darts_core_mult = 9
-    comment = "Error??"
+    for angle_start, angle_end, score in angles_distances_array:
+        if angle_start <= angle < angle_end:
+                dart_score = score
+                
+    if triple_distance_limit_lower < distance <= triple_distance_limit_upper:
+        dart_score_mult = 3
+    elif double_distance_limit_lower < distance <= double_distance_limit_upper:
+        dart_score_mult = 2
+    else:
+        dart_score_mult = 1
 
-    return dartscore, darts_core_mult, comment
+    return dart_score, dart_score_mult, comment 
+
+    
+    
 
 
 ######################################################
     # WHAT SHOULD I TAKE THIS DART AS? #   DEPENDS ON STRATEGY
 ######################################################
-def DecideScore(player, dartscore, darts_core_mult):
+def DecideScore(player, dart_score, dart_score_mult):
 
     ########## NOT PROGRAMMED ####################
     # THERE'S A DECISION ON HOW TO TAKE THE SCORING WHEN THERE ARE MULTIPLE OPTIONS?? When to take a double or triple rather than two or three twenties?
     # When multiple options: Triple; Three 15s; or 45 points – which one?
 
-    return player, dartscore, darts_core_mult
+    return player, dart_score, dart_score_mult
 
 
 ###########################################################
     # WHAT DOES THE UPDATED SCOREBOARD LOOK LIKE? #
 ###########################################################
-def BoardUpdate(board, player, current_score, dartscore, darts_core_mult, highest_score, completed, game_end, darts_to_finish, max_poss_scoring, fewer_remaining, scoring, triples, doubles):
+def BoardUpdate(board, player, current_score, dart_score, dart_score_mult, highest_score, completed, game_end, darts_to_finish, max_poss_scoring, fewer_remaining, scoring, triples, doubles):
 
-    #dartscore = 17
-    #darts_core_mult = 2
+    #dart_score = 17
+    #dart_score_mult = 2
     #player = 0
     #board[1 - player,0] = 3
     done = 0
 
-# Take partially to close off soemthing being scored on vs. take instead of scoring as they are more difficult to get
-# call ScoringDecision(completed, scoring, highest_score, triples, doubles) ??
+    # Take partially to close off soemthing being scored on vs. take instead of scoring as they are more difficult to get
+    # call ScoringDecision(completed, scoring, highest_score, triples, doubles) ??
 
     # Needing both Triples and the 15-20 hit
 
     # Bulls
-    if dartscore == 25:
-        if board[player, 6] + darts_core_mult >= 3 and board[1 - player, 6] < 3:
+    if dart_score == 25:
+        if board[player, 6] + dart_score_mult >= 3 and board[1 - player, 6] < 3:
             current_score[player, 0] = current_score[player, 0] + \
-                ((board[player, 6] + darts_core_mult - 3) * dartscore)
+                ((board[player, 6] + dart_score_mult - 3) * dart_score)
             done = 1
-        if board[player, 6] + darts_core_mult > 3:
+        if board[player, 6] + dart_score_mult > 3:
             board[player, 6] = 3
             done = 1
-        if board[player, 6] + darts_core_mult <= 3:
-            board[player, 6] = board[player, 6] + darts_core_mult
+        if board[player, 6] + dart_score_mult <= 3:
+            board[player, 6] = board[player, 6] + dart_score_mult
             done = 1
 
     # Triples
-    if darts_core_mult == 3 and done == 0:
+    if dart_score_mult == 3 and done == 0:
         if board[player, 7] + 1 <= 3:
             board[player, 7] = board[player, 7] + 1
             done = 1
         else:
-            if board[1 - player, 7] < 3 and dartscore < 15:
+            if board[1 - player, 7] < 3 and dart_score < 15:
                 current_score[player, 0] = current_score[player,
-                                                       0] + 3 * dartscore
+                                                       0] + 3 * dart_score
                 done = 1
-            if board[1 - player, 7] < 3 and 15 <= dartscore <= 20:
-                if completed[player, 20 - dartscore] == 1:
+            if board[1 - player, 7] < 3 and 15 <= dart_score <= 20:
+                if completed[player, 20 - dart_score] == 1:
                     current_score[player, 0] = current_score[player,
-                                                           0] + 3 * dartscore
+                                                           0] + 3 * dart_score
                     done = 1
 
     # Doubles
-    if darts_core_mult == 2 and done == 0:
+    if dart_score_mult == 2 and done == 0:
         if board[player, 8] + 1 <= 3:
             board[player, 8] = board[player, 8] + 1
             done = 1
         else:
             if board[1 - player, 8] < 3:
                 current_score[player, 0] = current_score[player,
-                                                       0] + 2 * dartscore
+                                                       0] + 2 * dart_score
                 done = 1
-            if board[1 - player, 8] < 3 and 15 <= dartscore <= 20 and done == 0:
-                if completed[player, 20 - dartscore] == 1:
+            if board[1 - player, 8] < 3 and 15 <= dart_score <= 20 and done == 0:
+                if completed[player, 20 - dart_score] == 1:
                     current_score[player, 0] = current_score[player,
-                                                           0] + 2 * dartscore
+                                                           0] + 2 * dart_score
                     done = 1
 
     # 20-15
-    if dartscore >= 15 and done == 0:
-        if 15 <= dartscore <= 20 and board[player, 20 - dartscore] + darts_core_mult <= 3:
-            board[player, 20 - dartscore] = board[player,
-                                                  20 - dartscore] + darts_core_mult
+    if dart_score >= 15 and done == 0:
+        if 15 <= dart_score <= 20 and board[player, 20 - dart_score] + dart_score_mult <= 3:
+            board[player, 20 - dart_score] = board[player,
+                                                  20 - dart_score] + dart_score_mult
             done = 1
         else:
-            if 15 <= dartscore <= 20 and board[1 - player, 20 - dartscore] < 3:
+            if 15 <= dart_score <= 20 and board[1 - player, 20 - dart_score] < 3:
                 current_score[player, 0] = current_score[player, 0] + \
-                    ((board[player, 20 - dartscore] +
-                      darts_core_mult - 3) * dartscore)
+                    ((board[player, 20 - dart_score] +
+                      dart_score_mult - 3) * dart_score)
                 done = 1
-            if 15 <= dartscore <= 20 and board[player, 20 - dartscore] + darts_core_mult > 3:
-                board[player, 20 - dartscore] = 3
+            if 15 <= dart_score <= 20 and board[player, 20 - dart_score] + dart_score_mult > 3:
+                board[player, 20 - dart_score] = 3
                 done = 1
 
 
-# update who has the highest score
+    # update who has the highest score
 
     if current_score[player] < current_score[1-player]:
         highest_score[player] = 0
@@ -641,7 +420,7 @@ def BoardUpdate(board, player, current_score, dartscore, darts_core_mult, highes
             highest_score[player] = 0
             highest_score[1-player] = 0
 
-# update 'completed' array
+    # update 'completed' array
     i = 0
     while i <= 8:
 
@@ -659,9 +438,9 @@ def BoardUpdate(board, player, current_score, dartscore, darts_core_mult, highes
                           (current_score[player, 0] > current_score[1 - player, 0]))
 
 
-# Count minimum darts remaining to win
+    # Count minimum darts remaining to win
 
-# calculate min darts to finish game, including a higher score
+    # calculate min darts to finish game, including a higher score
 
     i = 0
     darts_to_finish[player] = 0
@@ -689,23 +468,21 @@ def BoardUpdate(board, player, current_score, dartscore, darts_core_mult, highes
                 # For Triples(7) or Doubles(8), always 0,1,2,3 darts to finish each
                 if i == 7 or i == 8:
                     if board[player, i] < 3:
-                        darts_to_finish[player] = darts_to_finish[player] + \
-                            (3 - board[player, i])
+                        darts_to_finish[player] = darts_to_finish[player] + (3 - board[player, i])
                     if board[1-player, i] < 3:
-                        max_poss_scoring[player] = (
-                            8-i)*max(max_poss_scoring[player], 60) + (i-7)*max(max_poss_scoring[player], 50)
+                        max_poss_scoring[player] = (8-i)*max(max_poss_scoring[player], 60) + (i-7)*max(max_poss_scoring[player], 50)
 
         i = i+1
 
 
-# for player with lower score, divide by maximum of what other player has not completed
+    # for player with lower score, divide by maximum of what other player has not completed
 
     if highest_score[player] == 0:
         darts_to_finish[player] = darts_to_finish[player] + np.ceil(
             (current_score[1-player] - current_score[player]) / max_poss_scoring[player] + 0.01)  # min of one darts if tied or losing
 
 
-# assess whether winning or not
+    # assess whether winning or not
     if darts_to_finish[player] < darts_to_finish[1-player]:
         fewer_remaining[player] = 1
         fewer_remaining[1-player] = 0
@@ -719,7 +496,7 @@ def BoardUpdate(board, player, current_score, dartscore, darts_core_mult, highes
             fewer_remaining[1-player] = 0
 
 
-# print current state variables
+    # print current state variables
     print('---')
     print('Board: '+str(board[player]))
     print('Score: '+str(current_score[player]) +
@@ -748,13 +525,15 @@ def BoardViz(arrow_x, arrow_y, i,col):
     y = (arrow_y + 150) / (300/(8.77-1.23)) + 1.23
 
     # datafile = cbook.get_sample_data('./nodordartboard.jpg')
-    datafile = './nodordartboard.jpg'
+    datafile = './nodordartboard-min.png'
+    
     img = imread(datafile)
     # datafile2 = cbook.get_sample_data('./chalkboard.jpg')
-    datafile2 = './chalkboard.jpg'
-    img2 = imread(datafile2)
+    # datafile2 = './chalkboard.jpg'
+    # img2 = imread(datafile2)
     # datafile3 = cbook.get_sample_data('./dart.bmp')
-    datafile3 = './dart.png'
+    datafile3 = './dart-min.png'
+    # datafile3 = dart_img
     img3 = imread(datafile3)
 
     # plt.scatter(x,y,zorder=2)
@@ -780,13 +559,13 @@ def Entry():
     # Capture each of the three darts thrown by the human and any score and then boardupdate??
     # Needs error checking/validation like entering the skill level
 
-    darts_core_mult = input("Enter S/D/T as 1 to 3: ")
-    dartscore = input("Enter 1 to 20 or 25: ")
+    dart_score_mult = input("Enter S/D/T as 1 to 3: ")
+    dart_score = input("Enter 1 to 20 or 25: ")
     entryscore = input("Enter any scored points: ")
 
-    print(str(darts_core_mult)+" "+str(dartscore)+" "+str(entryscore))
+    print(str(dart_score_mult)+" "+str(dart_score)+" "+str(entryscore))
 
-    return dartscore, darts_core_mult, entryscore
+    return dart_score, dart_score_mult, entryscore
 
 
 ######################################################
@@ -814,12 +593,12 @@ def Entry():
 #         aiming_arrow_x, aiming_arrow_y = Aim(aiming_for, aiming_for_mult)
 #         nowspread = Accuracy(generalspread)  # SKILL/FOCUS/LUCK
 #         arrow_x, arrow_y = Throw(aiming_arrow_x, aiming_arrow_y, nowspread)  # THROW/LAND
-#         dartscore, darts_core_mult, comment = Score(arrow_x, arrow_y)  # DART SCORE
+#         dart_score, dart_score_mult, comment = Score(arrow_x, arrow_y)  # DART SCORE
 
-#         print(comment+" "+str(dartscore)+"*"+str(darts_core_mult))
+#         print(comment+" "+str(dart_score)+"*"+str(dart_score_mult))
 
 #         board, current_score, game_end, completed, scoring, highest_score, triples, doubles,  darts_to_finish, max_poss_scoring, fewer_remaining = BoardUpdate(
-#             player, dartscore, darts_core_mult)  # UPDATE variables after throw
+#             player, dart_score, dart_score_mult)  # UPDATE variables after throw
 
 #         #print("aiminingarrow_x: "+str(np.round(aiming_arrow_x,0))+" aiming_arrow_y: "+str(np.round(aiming_arrow_y,0)))
 #         #print("arrow_x: "+str(np.round(arrow_x,0))+" arrow_y: "+str(np.round(arrow_y,0)))
@@ -853,3 +632,297 @@ def Entry():
 
 #     player = 1 - player
 #     turns = turns + 1
+
+
+
+
+
+
+
+
+
+
+    # #
+    # # 20
+    # if 81 <= angle < 99:
+    #     if 74 < distance <= 84:
+    #         dart_score = 20
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 20
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 20
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+    # # 5
+    # if 99 <= angle < 117:
+    #     if 74 < distance <= 84:
+    #         dart_score = 5
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 5
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 5
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+    # # 12
+    # if 117 <= angle < 135:
+    #     if 74 < distance <= 84:
+    #         dart_score = 12
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 12
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 12
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+    
+
+    # # 9
+    # if 135 <= angle < 153:
+    #     if 74 < distance <= 84:
+    #         dart_score = 9
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 9
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 9
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+
+        
+    # # 14
+    # if 153 <= angle < 171:
+    #     if 74 < distance <= 84:
+    #         dart_score = 14
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 14
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 14
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+ 
+    # # 11
+    # if 171 <= angle < 189:
+    #     if 74 < distance <= 84:
+    #         dart_score = 11
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 11
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 11
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+    # # 8
+  
+    # if 189 <= angle < 207:
+    #     if 74 < distance <= 84:
+    #         dart_score = 8
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 8
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 8
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+
+    # # 16
+    # if 207 <= angle < 225:
+    #     if 74 < distance <= 84:
+    #         dart_score = 16
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 16
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 16
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+
+    # #   7
+    # if 225 <= angle < 243:
+    #     if 74 < distance <= 84:
+    #         dart_score = 7
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 7
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 7
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+                 
+    # # 19
+    # if 243 <= angle < 261:
+    #     if 74 < distance <= 84:
+    #         dart_score = 19
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 19
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 19
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+   
+    # # 3
+    # if 261 <= angle < 279:
+    #     if 74 < distance <= 84:
+    #         dart_score = 3
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 3
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 3
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+     
+    # # 17
+    # if 279 <= angle < 297:
+    #     if 74 < distance <= 84:
+    #         dart_score = 17
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 17
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 17
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+   
+    # # 2
+    # if 297 <= angle < 315:
+    #     if 74 < distance <= 84:
+    #         dart_score = 2
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 2
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 2
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+  
+    # # 15
+    # if 315 <= angle < 333:
+    #     if 74 < distance <= 84:
+    #         dart_score = 15
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 15
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 15
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+      
+    # # 10
+    # if 333 <= angle < 351:
+    #     if 74 < distance <= 84:
+    #         dart_score = 10
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 10
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 10
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+    # # 6
+    # if (351 <= angle < 361) or (0 <= angle < 9):
+    #     if 74 < distance <= 84:
+    #         dart_score = 6
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 6
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 6
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+     
+    # # 13
+    # if 9 <= angle < 27:
+    #     if 74 < distance <= 84:
+    #         dart_score = 13
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 13
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 13
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+
+    # # 4
+    # if 27 <= angle < 45:
+    #     if 74 < distance <= 84:
+    #         dart_score = 4
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 4
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 4
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+   
+    # # 18
+    # if 45 <= angle < 63:
+    #     if 74 < distance <= 84:
+    #         dart_score = 18
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 18
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 18
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+    # # 1
+    # if 63 <= angle < 81:
+    #     if 74 < distance <= 84:
+    #         dart_score = 1
+    #         dart_score_mult = 3
+    #     else:
+    #         if 134 < distance <= 144:
+    #             dart_score = 1
+    #             dart_score_mult = 2
+    #         else:
+    #             dart_score = 1
+    #             dart_score_mult = 1
+    #     return dart_score, dart_score_mult, comment
+
+    # dart_score = 999
+    # dart_score_mult = 9
+    # comment = "Error??"
+
+    # return dart_score, dart_score_mult, comment
