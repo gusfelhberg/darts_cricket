@@ -266,6 +266,8 @@ def Score(arrow_x, arrow_y):
         comment = "Single Bull!"
         return dart_score, dart_score_mult, comment
 
+
+
     ######################
             # 20...1 #
     ######################
@@ -533,6 +535,7 @@ def BoardViz(arrow_x, arrow_y, i,col):
     # img2 = imread(datafile2)
     # datafile3 = cbook.get_sample_data('./dart.bmp')
     datafile3 = './dart-min.png'
+
     # datafile3 = dart_img
     img3 = imread(datafile3)
 

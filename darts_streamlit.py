@@ -78,17 +78,13 @@ def new_game(turns,
         if player == 0:
             st.write('---')
             cols_player = st.beta_columns([1,1,1,2,1,1,1])
-            cols_player[1].markdown(f'### Turn: {str(turns+1)}')
-            cols_player[5].markdown(f'### Turn: {str(turns+2)}')            
+            cols_player[1].markdown(f'### Turn: {str(turns+1)}', unsafe_allow_html=True)
+            cols_player[5].markdown(f'### Turn: {str(turns+2)}', unsafe_allow_html=True)            
             cols = st.beta_columns([1,1,1,2,1,1,1])
 
         for i in range(1, 4):
             aiming_for, aiming_for_mult = Decide(
                 player, completed, scoring, highest_score, triples, doubles)  # DECISION -> Replace with RL
-            if player == 0:
-                cols[i-1].write("Aiming At: "+str(aiming_for) +"*"+str(aiming_for_mult))
-            else:
-                cols[i+4-1].write("Aiming At: "+str(aiming_for) +"*"+str(aiming_for_mult))                
 
             # AIM -> Consoder (x,y) policy instead?
             aiming_arrow_x, aiming_arrow_y = Aim(aiming_for, aiming_for_mult)
@@ -98,24 +94,38 @@ def new_game(turns,
             
             # overall_score[player] = overall_score[player] + dartscore * darts_core_mult
 
-            print(comment+" "+str(dartscore)+"*"+str(darts_core_mult))
-            if player == 0:
-                cols[i-1].write(comment+" "+str(dartscore) + "*"+str(darts_core_mult))
-            else:
-                cols[i+4-1].write(comment+" "+str(dartscore) + "*"+str(darts_core_mult))
-            
+
             board, current_score, game_end, completed, scoring, highest_score, triples, doubles,  darts_to_finish, max_poss_scoring, fewer_remaining = BoardUpdate(
                 board, player, current_score, dartscore, darts_core_mult, highest_score, completed, game_end, darts_to_finish, max_poss_scoring, fewer_remaining, scoring, triples, doubles)  # UPDATE variables after throw
+
+            if player == 0:
+                cols[i-1].markdown("Aiming At: "+str(aiming_for) +"*"+str(aiming_for_mult), unsafe_allow_html=True)
+            else:
+                cols[i+4-1].markdown("Aiming At: "+str(aiming_for) +"*"+str(aiming_for_mult), unsafe_allow_html=True)                
 
             if player == 0:
                 BoardViz(arrow_x, arrow_y, i, cols[i-1])
             else:
                 BoardViz(arrow_x, arrow_y, i, cols[i+4-1])
-            
+                
+            print(comment+" "+str(dartscore)+"*"+str(darts_core_mult))
             if player == 0:
-                cols[i-1].write(f'Score: {current_score[player][0]}')
+                cols[i-1].markdown(comment+" "+str(dartscore) + "*"+str(darts_core_mult), unsafe_allow_html=True)
             else:
-                cols[i+4-1].write(f'Score: {current_score[player][0]}')
+                cols[i+4-1].markdown(comment+" "+str(dartscore) + "*"+str(darts_core_mult), unsafe_allow_html=True)
+                            
+                
+                
+#                 "Single Bull!"
+# "Double Bull!"
+# "Bounced!"
+# "Backboard!"
+# "Hit!"
+            
+            # if player == 0:
+            #     cols[i-1].write(f'Score: {int(current_score[player][0])}')
+            # else:
+            #     cols[i+4-1].write(f'Score: {int(current_score[player][0])}')
 
 
             if game_end[0, 0] == 1:
