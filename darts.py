@@ -198,8 +198,7 @@ class Darts:
             comment = "Backboard!"
             return dart_score, dart_score_mult, comment
 
-        ### Wire Shots ###
-        
+        ### Wire Shots ###        
         else:
             wireshot_bounce = 0.2
             if (np.round(distance, 0) in [10, 20, 74, 84, 134, 144]) or \
@@ -489,9 +488,7 @@ LEADING   {'o/' if self.current_score[0][0] > self.current_score[1][0] else '   
 DTF       {int(self.darts_to_finish[0][0])}\t\t  {int(self.darts_to_finish[1][0])}
 MPSL      {int(self.current_score[0][0])}-{int(self.current_score[1][0])}/{int(self.max_possible_scoring[0][0])}\t  {int(self.current_score[1][0])}-{int(self.current_score[0][0])}/{int(self.max_possible_scoring[1][0])}
 
-DTF -> Darts to finish
-MPSL -> Max Poss. Scoring Left
-                ''')
+DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left''')
 
 
 
@@ -577,7 +574,7 @@ MPSL -> Max Poss. Scoring Left
 
         self.player = 0
 
-        while self.game_end[0,0] == 0:
+        while self.game_end[0,0] == 0 and self.turns < 50:
 
             print()
             print('#####################################')
@@ -621,9 +618,13 @@ MPSL -> Max Poss. Scoring Left
             self.player = 1 - self.player
             self.turns = self.turns + 1
 
-            
-            if self.turns % 50 == 0:
-                continue_ = input(f'Turn {self.turns} - Press ENTER to continue...')
+        if self.turns == 50:
+            self.print_main_variables()
+            print(f"\nNo winner after {str(self.turns)} turns!")
+            sys.exit()
+
+            # if self.turns % 50 == 0:
+            #     continue_ = input(f'Turn {self.turns} - Press ENTER to continue...')
 
 
 
