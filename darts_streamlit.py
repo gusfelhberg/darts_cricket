@@ -1,5 +1,6 @@
 from Darts_Opponent_Cricket import Accuracy, Throw, Score, Aim, Decide, BoardViz, Skill, GameReset, BoardUpdate
 import streamlit as st
+import streamlit.components.v1 as components
 
 import numpy as np
 # from Darts_Opponent_Cricket import *
@@ -65,8 +66,10 @@ def new_game(turns,
     end_of_game = False
     
     cols_title = st.beta_columns([3,1,3])
-    cols_title[0].title('Player 0')
-    cols_title[2].title('Player 1')
+    cols_title[0].title('Welcome Mr B. With an Y!')
+    cols_title[2].title('Your Opponent')
+    with cols_title[2].beta_container():
+        components.iframe("https://thispersondoesnotexist.com/",width=150)
 
     while game_end[0, 0] == 0:
 
