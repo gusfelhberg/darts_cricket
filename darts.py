@@ -26,6 +26,7 @@ warnings.filterwarnings('ignore')
 
 class Darts:
 
+    # Similar to previous GameReset()
     def __init__(self):
         self.turns = 0
 
@@ -49,16 +50,16 @@ class Darts:
         self.dartn           = np.zeros((3))            # 1 to 20, or 25
         self.entry_score     = 0
 
-
-    def assign_player_skill(self):
+    # def Skill():
+    def assign_player_skill(self, level=4):
 
         self.general_spread = np.zeros((2, 1)) 
-        level  = 4
 
         self.general_spread[0] = np.round((6 - level) * 15 - np.sqrt( 5 - level) * 10 + (3 - 6 * random()), 0) 
         self.general_spread[1] = np.round((6 - level) * 15 - np.sqrt( 5 - level) * 10 + (3 - 6 * random()), 0) 
 
 
+    # def Decide(player, completed, scoring, highestscore, triples, doubles):
     def decide_target(self):
 
         aiming_for = 0
@@ -135,6 +136,8 @@ class Darts:
     ######################################################
                 # WHERE SHOULD I AIM THIS DART? #
     ######################################################
+
+    # def Aim(aimingfor, aimingformult):
     def set_aim_coordinates(self):
         
         a = array('i',[0,72,306,270,36,108,0,234,198,144,342,180,126,18,162,324,216,288,54,252,90])
@@ -153,6 +156,8 @@ class Darts:
     ######################################################
             # HOW GOOD WILL THIS DART BE? #
     ######################################################
+    
+    # def Accuracy(generalspread):
     def get_dart_accuracy(self):
 
         self.now_spread = 0
@@ -162,17 +167,19 @@ class Darts:
     ######################################################
                 # WHERE DID THIS DART LAND? #
     ######################################################
+
+    # def Throw(aimingarrowx,aimingarrowy,nowspread):
     def throw_dart(self):
     
         self.arrow_x = np.round(self.aiming_arrow_x + 2*(self.now_spread*(0.5-random())),0)[0]
         self.arrow_y = np.round(self.aiming_arrow_y + 2*(self.now_spread*(0.5-random())),0)[0]
 
 
-
-
     ######################################################
         # HOW DID THIS DART SCORE? #
     ######################################################
+
+    # def Score(arrowx,arrowy):
     def get_dart_score(self):
         # Returning values in case of not matching any of the scenarios
         dart_score = 999
@@ -199,6 +206,9 @@ class Darts:
             return dart_score, dart_score_mult, comment
 
         ### Wire Shots ###        
+
+        # Here the original code was using the same return values for two distinct conditions
+        # The new code combines the two conditions, but using an OR
         else:
             wireshot_bounce = 0.2
             if (np.round(distance, 0) in [10, 20, 74, 84, 134, 144]) or \
@@ -228,6 +238,16 @@ class Darts:
         ######################
                 # 20...1 #
         ######################
+
+        # The original code was repeting the same logic for different angles
+        # To make it simpler, all the combinations of angles (start and end)
+        # and respective score number were combined in the list 'angles_distances_arrays' below
+        # This way, instead of having a similar block of code for each angle range, 
+        # we can have one block of code being used for each element of the array
+
+        # A similar idea applies to the code that compares the distances to select the multiplication factor
+        # The new code adds only one comparison of the distances after the code below.
+
         triple_distance_limit_lower = 74
         triple_distance_limit_upper = 84
         double_distance_limit_lower = 134
@@ -290,6 +310,8 @@ class Darts:
     ###########################################################
                 # WHAT DOES THE UPDATED SCOREself.boardLOOK LIKE? #
     ###########################################################
+
+    # def BoardUpdate(player, dartscore, dartscoremult):
     def update_board(self):
 
         #self.dart_score = 17
@@ -497,6 +519,7 @@ DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left''')
                 # WHAT DOES THE DARTBOARD LOOK LIKE? #
     ######################################################
 
+    # def BoardViz(arrowx,arrowy,i):
     def draw_board(self):
         x = 0
         y = 0
@@ -542,7 +565,7 @@ DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left''')
         #print(x,y)
 
 
-    def Entry():
+    def Entry(self):
 
         ############### NOT FULLY PROGRAMMED ################
         #####Capture each of the three darts thrown by the human and any score and then boardupdate??  
@@ -570,7 +593,7 @@ DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left''')
         # turns, board, currentscore, dartstofinish, maxpossscoring, fewerremaining, gameend, completed, scoring, highestscore, triples, doubles, dartm, dartn, entryscore    = GameReset()   #RESET variables                                     
         # generalspread = Skill()       #SKILL level
 
-        self.assign_player_skill()
+        self.assign_player_skill(level=4)
 
         self.player = 0
 
@@ -622,11 +645,6 @@ DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left''')
             self.print_main_variables()
             print(f"\nNo winner after {str(self.turns)} turns!")
             sys.exit()
-
-            # if self.turns % 50 == 0:
-            #     continue_ = input(f'Turn {self.turns} - Press ENTER to continue...')
-
-
 
 
 if __name__ == "__main__":
