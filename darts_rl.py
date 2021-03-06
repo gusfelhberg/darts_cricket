@@ -50,6 +50,81 @@ class Darts:
         self.dartn           = np.zeros((3))            # 1 to 20, or 25
         self.entry_score     = 0
 
+        self.done = 0
+
+        self.reward = np.zeros((2, 1))
+        self.log_rewards = [[],[]]
+
+    	# action_id: [self.aiming_for, aiming_for_mult]
+        self.action_space = { 
+                            0: [25, 1],
+                            1: [25, 2],
+                            2: [1, 1],
+                            3: [1, 2],
+                            4: [1, 3],
+                            5: [2, 1],
+                            6: [2, 2],
+                            7: [2, 3],
+                            8: [3, 1],
+                            9: [3, 2],
+                            10: [3, 3],
+                            11: [4, 1],
+                            12: [4, 2],
+                            13: [4, 3],
+                            14: [5, 1],
+                            15: [5, 2],
+                            16: [5, 3],
+                            17: [6, 1],
+                            18: [6, 2],
+                            19: [6, 3],
+                            20: [7, 1],
+                            21: [7, 2],
+                            22: [7, 3],
+                            23: [8, 1],
+                            24: [8, 2],
+                            25: [8, 3],
+                            26: [9, 1],
+                            27: [9, 2],
+                            28: [9, 3],
+                            29: [10, 1],
+                            30: [10, 2],
+                            31: [10, 3],
+                            32: [11, 1],
+                            33: [11, 2],
+                            34: [11, 3],
+                            35: [12, 1],
+                            36: [12, 2],
+                            37: [12, 3],
+                            38: [13, 1],
+                            39: [13, 2],
+                            40: [13, 3],
+                            41: [14, 1],
+                            42: [14, 2],
+                            43: [14, 3],
+                            44: [15, 1],
+                            45: [15, 2],
+                            46: [15, 3],
+                            47: [16, 1],
+                            48: [16, 2],
+                            49: [16, 3],
+                            50: [17, 1],
+                            51: [17, 2],
+                            52: [17, 3],
+                            53: [18, 1],
+                            54: [18, 2],
+                            55: [18, 3],
+                            56: [19, 1],
+                            57: [19, 2],
+                            58: [19, 3],
+                            59: [20, 1],
+                            60: [20, 2],
+                            61: [20, 3],
+        }
+
+
+    def get_action_space(self):
+        return len(self.action_space.keys())
+
     # def Skill():
     def assign_player_skill(self, level=4):
 
@@ -107,7 +182,6 @@ class Darts:
                 scoring_on = 8-j
                 # print('###### Scoring On: '+str(scoring_on))
 
-
         if scoring_on <= 5 :   ##### RARE BUG EVERY 30-40 GAMES ??scoring_on?? ##################
             aiming_for = 20 - scoring_on
             aiming_for_mult = 3  # single = 1; double = 2; triple = 3
@@ -142,8 +216,6 @@ class Darts:
         
         a = array('i',[0,72,306,270,36,108,0,234,198,144,342,180,126,18,162,324,216,288,54,252,90])
         d = array('i',[0,109,139,79]) 
-        self.aiming_arrow_x = 0
-        self.aiming_arrow_y = 0
 
         if self.aiming_for <= 20:
             self.aiming_arrow_x = d[self.aiming_for_mult] * math.cos(a[self.aiming_for]*math.pi/180)
@@ -314,17 +386,7 @@ class Darts:
     # def BoardUpdate(player, dartscore, dartscoremult):
     def update_board(self):
 
-        #self.dart_score = 17
-        #self.dart_score_mult = 2
-        #player = 0
-        #board[1 - player,0] = 3
         done = 0
-
-        ########### Take partially to close off something being scored on vs. 
-        # take instead of scoring as they are more difficult to get
-        # call ScoringDecision(completed, scoring, self.has_highest_score, triples, doubles) ??
-
-        # Needing both Triples and the 15-20 hit
 
         #Bulls
         if self.dart_score == 25:
@@ -440,19 +502,9 @@ class Darts:
             ##### IF THE OTHER PLAYER HAS COMPLETED, PASS
             if self.completed[1-self.player].sum() < 9:
             
-                # print('before')
-                # print(self.darts_to_finish[self.player])
                 self.darts_to_finish[self.player] = self.darts_to_finish[self.player] + \
                                                     np.ceil((self.current_score[1-self.player] - self.current_score[self.player] ) / \
                                                             self.max_possible_scoring[self.player] + 0.01) #min of one darts if tied or losing
-                # print('after')
-                # print(self.darts_to_finish[self.player])
-                
-                # if np.isnan(self.darts_to_finish[self.player][0]):
-                #     self.darts_to_finish[self.player][0] = 0
-                #     print('AAAAAAAAAAAAAAAAAAAAAA')
-                #     print(self.darts_to_finish[self.player])
-                #     continue_ = input('Press ENTER to continue')
             
 
         # Assess whether winning or not
@@ -466,20 +518,12 @@ class Darts:
             self.has_fewer_remaining[self.player]  = 0
             self.has_fewer_remaining[1-self.player]  = 0
 
+        if self.game_end[self.player][0] == 1:
+            self.done = 1
+
+
 
     def print_main_variables(self):
-
-        # print('---')
-        # print('Board: '+str(self.board[self.player]))
-        # print(f'Board P{self.player}: '+str(self.board[self.player]))
-        # print(f'Board P{1-self.player}: '+str(self.board[1-self.player]))
-        # print('Score: '+str(self.current_score[self.player])+' Leading: '+str(self.has_highest_score[self.player]))
-        # print('Completed: '+str(self.completed[self.player]))
-        # print('Scoring: '+str(self.scoring[self.player]))
-        # print('Darts to Finish: '+str(self.darts_to_finish[self.player])+' Fewer remaining: '+str(self.has_fewer_remaining[self.player])+' Max Poss. Scoring Left: '+str(self.current_score[self.player])+'-'+str(self.current_score[1-self.player])+' / '+str(self.max_possible_scoring[self.player]))
-        # print('GameOver: '+str(self.game_end[self.player]))
-        # print('---')
-        
         
         def get_string(x):
             if x == 0:
@@ -509,8 +553,13 @@ SCORE     {int(self.current_score[0][0])}\t\t  {int(self.current_score[1][0])}
 LEADING   {'o/' if self.current_score[0][0] > self.current_score[1][0] else '   '}\t\t  {'o/' if self.current_score[0][0] < self.current_score[1][0] else ''}
 DTF       {int(self.darts_to_finish[0][0])}\t\t  {int(self.darts_to_finish[1][0])}
 MPSL      {int(self.current_score[0][0])}-{int(self.current_score[1][0])}/{int(self.max_possible_scoring[0][0])}\t  {int(self.current_score[1][0])}-{int(self.current_score[0][0])}/{int(self.max_possible_scoring[1][0])}
+REWARDS   {int(self.reward[0][0])}\t\t  {int(self.reward[1][0])}
+DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left
 
-DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left''')
+REWARD LOG:
+{' ; '.join(self.log_rewards[self.player])}''')
+
+
 
 
 
@@ -557,12 +606,9 @@ DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left''')
         # plt.scatter(x,y,zorder=2)
         plt.axis('off')
         plt.imshow(img3, zorder=2, extent=[x-.39, x+.61, y-.9, y+.05])  # DART
-        # plt.imshow(img2, zorder=1, extent=[8.5, 10, 0, 2])  # CHALK BOARD
         plt.imshow(img, zorder=0, extent=[0, 10, 0, 10])  # DARTBOARD
 
         plt.show()
-
-        #print(x,y)
 
 
     def Entry(self):
@@ -577,18 +623,7 @@ DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left''')
 
         print(str(dartscoremult)+" "+str(dartscore)+" "+str(entryscore)) 
 
-
         return dartscore, dartscoremult, entryscore
-
-
-    #####################################################
-                        # STEP #
-    #####################################################
-
-    def run_step(self):
-
-        pass
-
 
 
 
@@ -598,53 +633,35 @@ DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left''')
     
     def run_game(self):
 
-        ### NEED TO SET UP TO PLAY AGAINST HUMAN CALLING Entry()... 
-        ### NEED TO DISPLAY UPDATED CHALKBOARD BEFORE HUMAN Entery() 
-
-        # turns, board, currentscore, dartstofinish, maxpossscoring, fewerremaining, gameend, completed, scoring, highestscore, triples, doubles, dartm, dartn, entryscore    = GameReset()   #RESET variables                                     
-        # generalspread = Skill()       #SKILL level
+        max_turns = 50
 
         self.assign_player_skill(level=4)
 
         self.player = 0
 
-        while self.game_end[0,0] == 0 and self.turns < 50:
+        while self.done == 0 and self.turns < max_turns:
 
             print()
-            print('#####################################')
-            print(f'####### PLAYER {str(self.player)} - TURN {str(self.turns+1)} ##########')
-            print('#####################################')
+            print('###############################################################################')
+            print(f'######################## PLAYER {str(self.player)} - TURN {str(self.turns+1)} ####################################')
+            print('###############################################################################')
             print()
             
 
-            for i in range(1,4): # from 1 to 3
+            for _ in range(1,4): # from 1 to 3
                 self.aiming_for, self.aiming_for_mult = self.decide_target()
-                self.set_aim_coordinates()
-                self.get_dart_accuracy()
-                self.throw_dart()
-                self.dart_score, self.dart_score_mult, self.comment = self.get_dart_score()
+                self.reward, self.state, self.done = self.step(action = self.aiming_for, action_mult = self.aiming_for_mult, player=self.player)
 
-                print(str(self.dart_score)+"*"+str(self.dart_score_mult)+' ('+self.comment+")")
-
-                self.update_board()
-
-                ##############
-                #ADD DARTBOARD ANIMATION AFTER EACH TURN BACK WHEN PLAYING AGAINST HUMAN ##
-                #Board(arrowx,arrowy,i)
-                ##############
-
-                if self.game_end[0,0] == 1 :
+                if self.done == 1 :
                     self.turns = self.turns + 1
                     self.print_main_variables()
                     print("\nI Win! Great Game! Turns: "+str(self.turns))
-                    # print("Skill:",self.general_spread)
                     sys.exit()
 
-                if self.game_end[1,0] == 1 :
+                if self.done == 1 :
                     self.turns = self.turns + 1
                     self.print_main_variables()
                     print("\nYou Win! Great Game! Turns: "+str(self.turns))
-                    # print("Skill:",self.general_spread)
                     sys.exit()
 
 
@@ -652,13 +669,140 @@ DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left''')
             self.player = 1 - self.player
             self.turns = self.turns + 1
 
+            cont = input("Press ENTER to continue")
+
         if self.turns == 50:
             self.print_main_variables()
             print(f"\nNo winner after {str(self.turns)} turns!")
             sys.exit()
 
 
+
+    #####################################################
+                        # AI CONTROL #
+    #####################################################
+
+    ### GENERAL RULES
+
+    ## RL Agent is Player 0. Player 1 will also play, but just to update the board/scores
+    ## The training will be focused on Player 0
+    ## State Space is composed of the full board, array completed, array scoring, respective scores, and darts to finish
+    ## Example:
+    ##      state_space = [
+    #                       [
+    #                           [3,3,3,2,0,0,0,0,0],    --> Player 0 (RL Agent) board
+    #                           [3,3,0,0,0,0,0,2,0]     --> Player 1 board
+    #                       ],
+    #                       [
+    #                           [1,1,1,0,0,0,0,0,0],    --> Player 0 (RL Agent) completed
+    #                           [1,1,0,0,0,0,0,0,0]     --> Player 1 board
+    #                       ],
+    #                       [
+    #                           [0,0,1,0,0,0,0,0,0],    --> Player 0 (RL Agent) scoring
+    #                           [0,0,0,0,0,0,0,0,0]     --> Player 1 board
+    #                       ],#     
+    #                       [
+    #                           [30],  --> Player 0 (RL Agent) current total score
+    #                           [25]   --> Player 1 current total score
+    #                       ],
+    #                       [
+    #                           [10],  --> Player 0 (RL Agent) darts to finish
+    #                           [12]   --> Player 1 darts to finish
+    #                       ]     
+    #                   ]
+    # This array is then flattened to be used in the RL engine (file darts_dql.py)
+
+
+    def reset(self):
+
+        self.turns = 0
+
+        # 0-20; 1-19; 2-18; 3-17; 4-16; 5-15; 6-B; 7-T; 8-D
+        self.board                  = np.zeros((2, 9))         # number of Xs for each number for each player
+        self.current_score          = np.zeros((2, 1))         # current score for each player
+        self.darts_to_finish        = np.zeros((2, 1))         # minimum number of darts needed to finish game
+        self.darts_to_finish        = np.array([[15],[15]])         # minimum number of darts needed to finish game
+        self.max_possible_scoring   = np.zeros((2, 1))         # maximum can score on based on what's open for the oppoenent
+        self.has_fewer_remaining    = np.zeros((2, 1))         # binary for whoever has the fewest darts needed to finish the game - either both 0 (tie) or only one 1
+        self.game_end               = np.zeros((2, 1))         # game over
+
+        # 0-20; 1-19; 2-18; 3-17; 4-16; 5-15; 6-B; 7-T; 8-D
+        self.completed          = np.zeros((2, 9))         # binary completed for each number for each player
+        self.scoring            = np.zeros((2, 9))         # binary scoring for each number for each player - either both 0 (tie) or only one 1
+        self.has_highest_score  = np.zeros((2, 1))         # binary for whoever has the highest score - either both 0 (tie) or only one 1
+        self.triples            = np.zeros((2, 1))         # binary for completed triples
+        self.doubles            = np.zeros((2, 1))         # binary for completed doubles
+
+        self.dartm           = np.zeros((3))            # multiples Single, Double, Triple
+        self.dartn           = np.zeros((3))            # 1 to 20, or 25
+        self.entry_score     = 0
+
+        self.done = 0
+        self.reward = np.zeros((2, 1))
+
+        state = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
+        state = [item for sublist in [item for sublist in state for item in sublist] for item in sublist]
+        return state
+
+
+
+    def step(self, action, action_mult, player=0):
+
+        # STEP includes the aim/throw/check for the RL Agent (player 0) and, if game not done, for the Player 1
+        self.player = player
+        
+        self.reward[self.player] = 0
+        self.log_rewards[self.player] = []
+
+        self.done = 0
+
+        self.aiming_for = action
+        self.aiming_for_mult = action_mult
+        
+        self.set_aim_coordinates()
+        self.get_dart_accuracy()
+        self.throw_dart()
+        self.dart_score, self.dart_score_mult, self.comment = self.get_dart_score()
+
+        print(str(self.dart_score)+"*"+str(self.dart_score_mult)+' ('+self.comment+")")
+
+        previous_num_completed = self.completed[self.player].sum()
+        previous_score = self.current_score[self.player]
+        self.update_board()  
+        updated_score = self.current_score[self.player]
+        updated_num_completed = self.completed[self.player].sum()
+
+        ## REWARDS
+        self.reward[self.player] -= 1
+        self.log_rewards[self.player].append('Throw penalty: -1')
+        
+        if self.darts_to_finish[self.player][0] < self.darts_to_finish[1-self.player][0] and self.turns > 1:
+            self.reward[self.player] += 2
+            self.log_rewards[self.player].append('Less darts to finish: +2')
+        elif self.darts_to_finish[self.player][0] > self.darts_to_finish[1-self.player][0] and self.turns > 1:
+            self.reward[self.player] -= 1
+            self.log_rewards[self.player].append('More darts to finish: -1')
+
+        if updated_score > previous_score:
+            self.reward[self.player] += int(previous_score - updated_score / 10)
+            self.log_rewards[self.player].append(f'Score increase: +{int(previous_score - updated_score / 10)}')
+
+        if updated_num_completed > previous_num_completed:
+            self.reward[self.player] += 3*(updated_num_completed - previous_num_completed)
+            self.log_rewards[self.player].append(f'Completed a number: +{int(3*(updated_num_completed - previous_num_completed))}')
+
+        if self.game_end[self.player][0] == 1:
+            self.reward[self.player] += 20
+            self.log_rewards[self.player].append('Won the game: +20')
+
+        state = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
+        state = [item for sublist in [item for sublist in state for item in sublist] for item in sublist]
+
+        return self.reward, state, self.done      
+
+
+
 if __name__ == "__main__":
     env = Darts()
-    while True:
-        env.run_game()
+    env.run_game()
+
