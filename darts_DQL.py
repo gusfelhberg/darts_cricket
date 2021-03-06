@@ -99,10 +99,8 @@ def train_dqn(episode):
                 score = reward[0]
                 player0.remember(state, action, reward, next_state, done)
                 state = next_state
-                # player0.replay()
                 if done:
                     print("episode: {}/{}, score: {}, winner: 0".format(e, episode, score))
-                    # print(env.game_end)
                     break
             if not done:
                 env.player = 1
@@ -111,9 +109,7 @@ def train_dqn(episode):
                     reward, next_state, done = env.step(action=env.action_space[action][0],action_mult=env.action_space[action][1],player=env.player)
                     if done:
                         print("episode: {}/{}, score: {}, winner: 1".format(e, episode, score))
-                        # print(env.game_end)
                         break                
-
 
         loss.append(score)
     return loss

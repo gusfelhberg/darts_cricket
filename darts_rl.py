@@ -651,6 +651,7 @@ REWARD LOG:
             for _ in range(1,4): # from 1 to 3
                 self.aiming_for, self.aiming_for_mult = self.decide_target()
                 self.reward, self.state, self.done = self.step(action = self.aiming_for, action_mult = self.aiming_for_mult, player=self.player)
+                print(str(self.dart_score)+"*"+str(self.dart_score_mult)+' ('+self.comment+")")
 
                 if self.done == 1 :
                     self.turns = self.turns + 1
@@ -748,7 +749,7 @@ REWARD LOG:
 
     def step(self, action, action_mult, player=0):
 
-        # STEP includes the aim/throw/check for the RL Agent (player 0) and, if game not done, for the Player 1
+
         self.player = player
         
         self.reward[self.player] = 0
@@ -763,8 +764,6 @@ REWARD LOG:
         self.get_dart_accuracy()
         self.throw_dart()
         self.dart_score, self.dart_score_mult, self.comment = self.get_dart_score()
-
-        print(str(self.dart_score)+"*"+str(self.dart_score_mult)+' ('+self.comment+")")
 
         previous_num_completed = self.completed[self.player].sum()
         previous_score = self.current_score[self.player]
