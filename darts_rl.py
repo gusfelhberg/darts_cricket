@@ -752,7 +752,6 @@ REWARD LOG:
 
         self.player = player
         
-        self.reward[self.player] = 0
         self.log_rewards[self.player] = []
 
         self.done = 0
@@ -772,8 +771,8 @@ REWARD LOG:
         updated_num_completed = self.completed[self.player].sum()
 
         ## REWARDS
-        self.reward[self.player] -= 1
-        self.log_rewards[self.player].append('Throw penalty: -1')
+        self.reward[self.player] -= 0.1
+        self.log_rewards[self.player].append('Throw penalty: -0.1')
         
         if self.darts_to_finish[self.player][0] < self.darts_to_finish[1-self.player][0] and self.turns > 1:
             self.reward[self.player] += 2
@@ -791,7 +790,7 @@ REWARD LOG:
             self.log_rewards[self.player].append(f'Completed a number: +{int(3*(updated_num_completed - previous_num_completed))}')
 
         if self.game_end[self.player][0] == 1:
-            self.reward[self.player] += 20
+            self.reward[self.player] += 10
             self.log_rewards[self.player].append('Won the game: +20')
 
         state = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
