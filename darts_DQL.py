@@ -46,7 +46,7 @@ class DQN:
 
         if np.random.rand() <= self.epsilon:
             return random.randrange(self.action_space)
-        act_values = self.model.predict(state)
+        act_values = self.model.predict(np.array(state).reshape(1,-1))
         return np.argmax(act_values[0])
 
     def replay(self):
@@ -57,7 +57,7 @@ class DQN:
         minibatch = random.sample(self.memory, self.batch_size)
         states = np.array([i[0] for i in minibatch])
         actions = np.array([i[1] for i in minibatch])
-        rewards = np.array([i[2] for i in minibatch])
+        rewards = np.array([i[2][0][0] for i in minibatch])
         next_states = np.array([i[3] for i in minibatch])
         dones = np.array([i[4] for i in minibatch])
 
@@ -79,8 +79,8 @@ def train_dqn(episode):
 
     loss = []
 
-    action_space = 62
-    state_space = 58
+    action_space = len(env.action_space)
+    state_space = len(env.state_space)
     max_steps = 50
 
     player0 = DQN(action_space, state_space) ## <-- FOCUS
@@ -99,6 +99,7 @@ def train_dqn(episode):
                 score = reward[0]
                 player0.remember(state, action, reward, next_state, done)
                 state = next_state
+                player0.replay()
                 if done:
                     print("episode: {}/{}, score: {}, winner: 0".format(e+1, episode, int(score[0])))
                     break

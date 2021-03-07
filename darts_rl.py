@@ -55,6 +55,10 @@ class Darts:
         self.reward = np.zeros((2, 1))
         self.log_rewards = [[],[]]
 
+        self.state_space = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
+        self.state_space = [item for sublist in [item for sublist in self.state_space for item in sublist] for item in sublist]
+
+
     	# action_id: [self.aiming_for, aiming_for_mult]
         self.action_space = { 
                             0: [25, 1],
@@ -650,7 +654,7 @@ REWARD LOG:
 
             for _ in range(1,4): # from 1 to 3
                 self.aiming_for, self.aiming_for_mult = self.decide_target()
-                self.reward, self.state, self.done = self.step(action = self.aiming_for, action_mult = self.aiming_for_mult, player=self.player)
+                self.reward, self.state_space, self.done = self.step(action = self.aiming_for, action_mult = self.aiming_for_mult, player=self.player)
                 print(str(self.dart_score)+"*"+str(self.dart_score_mult)+' ('+self.comment+")")
 
                 if self.done == 1 :
@@ -741,9 +745,9 @@ REWARD LOG:
         self.done = 0
         self.reward = np.zeros((2, 1))
 
-        state = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
-        state = [item for sublist in [item for sublist in state for item in sublist] for item in sublist]
-        return state
+        self.state_space = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
+        self.state_space = [item for sublist in [item for sublist in self.state_space for item in sublist] for item in sublist]
+        return self.state_space
 
 
 
@@ -772,6 +776,7 @@ REWARD LOG:
 
         ## REWARDS
         self.reward[self.player] -= 0.1
+        
         self.log_rewards[self.player].append('Throw penalty: -0.1')
         
         if self.darts_to_finish[self.player][0] < self.darts_to_finish[1-self.player][0] and self.turns > 1:
@@ -793,10 +798,10 @@ REWARD LOG:
             self.reward[self.player] += 10
             self.log_rewards[self.player].append('Won the game: +20')
 
-        state = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
-        state = [item for sublist in [item for sublist in state for item in sublist] for item in sublist]
+        self.state_space = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
+        self.state_space = [item for sublist in [item for sublist in self.state_space for item in sublist] for item in sublist]
 
-        return self.reward, state, self.done      
+        return self.reward, self.state_space, self.done      
 
 
 
