@@ -118,7 +118,7 @@ def train_dqn(episode):
 
 if __name__ == '__main__':
 
-    ep = 100
+    ep = 50
     loss = train_dqn(ep)
     plt.plot([i for i in range(ep)], loss)
     plt.xlabel('episodes')

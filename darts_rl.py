@@ -467,8 +467,8 @@ class Darts:
                     self.scoring[self.player,i] = 0
 
         #Track if everything is completed and score is higher
-        self.game_end[self.player] = min(min(self.completed[self.player]),(self.current_score[self.player,0] > self.current_score[1 - self.player,0]))  
-
+        self.game_end[self.player] = min(min(self.completed[self.player]),(self.current_score[self.player,0] > self.current_score[1 - self.player,0]))
+        self.game_end[self.player] = self.game_end[self.player][0]
         #####Count minimum darts remaining to win
         # calculate min darts to finish game, including a higher score
 
@@ -522,7 +522,7 @@ class Darts:
             self.has_fewer_remaining[self.player]  = 0
             self.has_fewer_remaining[1-self.player]  = 0
 
-        if self.game_end[self.player][0] == 1:
+        if self.game_end[self.player] == 1:
             self.done = 1
 
 
@@ -557,14 +557,14 @@ SCORE     {int(self.current_score[0][0])}\t\t  {int(self.current_score[1][0])}
 LEADING   {'o/' if self.current_score[0][0] > self.current_score[1][0] else '   '}\t\t  {'o/' if self.current_score[0][0] < self.current_score[1][0] else ''}
 DTF       {int(self.darts_to_finish[0][0])}\t\t  {int(self.darts_to_finish[1][0])}
 MPSL      {int(self.current_score[0][0])}-{int(self.current_score[1][0])}/{int(self.max_possible_scoring[0][0])}\t  {int(self.current_score[1][0])}-{int(self.current_score[0][0])}/{int(self.max_possible_scoring[1][0])}
-REWARDS   {int(self.reward[0][0])}\t\t  {int(self.reward[1][0])}
+REWARDS   {self.reward[0][0]:.2f}\t\t  {self.reward[1][0]:.2f}
 DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left
 
 REWARD LOG:
-{' ; '.join(self.log_rewards[self.player])}''')
-
-
-
+{'Throw 1: '+' ; '.join(self.log_rewards_full[self.player][1]) if len(self.log_rewards_full[self.player].keys()) >= 1 else ""}
+{'Throw 2: '+' ; '.join(self.log_rewards_full[self.player][2]) if len(self.log_rewards_full[self.player].keys()) >= 2 else ""}
+{'Throw 3: '+' ; '.join(self.log_rewards_full[self.player][3]) if len(self.log_rewards_full[self.player].keys()) >= 3 else ""}
+''')
 
 
 
@@ -651,29 +651,25 @@ REWARD LOG:
             print('###############################################################################')
             print()
             
+            self.log_rewards_full = [{},{}]
 
-            for _ in range(1,4): # from 1 to 3
+            for i in range(1,4): # from 1 to 3
                 self.aiming_for, self.aiming_for_mult = self.decide_target()
                 self.reward, self.state_space, self.done = self.step(action = self.aiming_for, action_mult = self.aiming_for_mult, player=self.player)
+                self.log_rewards_full[self.player][i] = self.log_rewards[self.player]
+                
                 print(str(self.dart_score)+"*"+str(self.dart_score_mult)+' ('+self.comment+")")
 
-                if self.done == 1 :
+                if self.game_end[self.player] == 1 :
                     self.turns = self.turns + 1
+                    
                     self.print_main_variables()
-                    print("\nI Win! Great Game! Turns: "+str(self.turns))
+                    print(f"\nPlayer {self.player} Wins! Great Game! Turns: "+str(self.turns))
                     sys.exit()
-
-                if self.done == 1 :
-                    self.turns = self.turns + 1
-                    self.print_main_variables()
-                    print("\nYou Win! Great Game! Turns: "+str(self.turns))
-                    sys.exit()
-
 
             self.print_main_variables()
             self.player = 1 - self.player
             self.turns = self.turns + 1
-
             cont = input("Press ENTER to continue")
 
         if self.turns == 50:
@@ -768,17 +764,27 @@ REWARD LOG:
         self.throw_dart()
         self.dart_score, self.dart_score_mult, self.comment = self.get_dart_score()
 
+        previous_num_valid_hits = self.board[self.player].sum()
         previous_num_completed = self.completed[self.player].sum()
         previous_score = self.current_score[self.player]
         self.update_board()  
         updated_score = self.current_score[self.player]
         updated_num_completed = self.completed[self.player].sum()
+        updated_num_valid_hits = self.board[self.player].sum()
+
+        if self.game_end[self.player] == 1:
+            self.done = 1
 
         ## REWARDS
         self.reward[self.player] -= 0.1
         
         self.log_rewards[self.player].append('Throw penalty: -0.1')
         
+        # If it hits a valid number (15-20 or Bull) and the number is not completed yet
+        if previous_num_valid_hits < updated_num_valid_hits:
+            self.reward[self.player] += 1
+            self.log_rewards[self.player].append('Hit a valid number: +1')
+
         if self.darts_to_finish[self.player][0] < self.darts_to_finish[1-self.player][0] and self.turns > 1:
             self.reward[self.player] += 2
             self.log_rewards[self.player].append('Less darts to finish: +2')
@@ -787,19 +793,26 @@ REWARD LOG:
             self.log_rewards[self.player].append('More darts to finish: -1')
 
         if updated_score > previous_score:
-            self.reward[self.player] += int(previous_score - updated_score / 10)
+            self.reward[self.player] += previous_score - updated_score / 10
             self.log_rewards[self.player].append(f'Score increase: +{int(previous_score - updated_score / 10)}')
 
         if updated_num_completed > previous_num_completed:
             self.reward[self.player] += 3*(updated_num_completed - previous_num_completed)
             self.log_rewards[self.player].append(f'Completed a number: +{int(3*(updated_num_completed - previous_num_completed))}')
 
-        if self.game_end[self.player][0] == 1:
-            self.reward[self.player] += 10
+        if self.game_end[self.player] == 1:
+            self.reward[self.player] += 20
             self.log_rewards[self.player].append('Won the game: +20')
+            self.reward[1-self.player] -= 30
+            self.log_rewards[1-self.player].append('Lost the game: -30')
+
+        
+
 
         self.state_space = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
         self.state_space = [item for sublist in [item for sublist in self.state_space for item in sublist] for item in sublist]
+
+
 
         return self.reward, self.state_space, self.done      
 
