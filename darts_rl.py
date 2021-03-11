@@ -30,6 +30,8 @@ class Darts:
     def __init__(self):
         self.turns = 0
 
+        self.throw_history = []
+
         # 0-20; 1-19; 2-18; 3-17; 4-16; 5-15; 6-B; 7-T; 8-D
         self.board                  = np.zeros((2, 9))         # number of Xs for each number for each player
         self.current_score          = np.zeros((2, 1))         # current score for each player
@@ -55,74 +57,65 @@ class Darts:
         self.reward = np.zeros((2, 1))
         self.log_rewards = [[],[]]
 
+        self.verbose = 1
+
+        # self.state_space = [self.board[0], self.completed[0], self.scoring[0], self.current_score[0], self.darts_to_finish[0]]
+        # self.state_space = [item for sublist in self.state_space for item in sublist]
+
         self.state_space = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
         self.state_space = [item for sublist in [item for sublist in self.state_space for item in sublist] for item in sublist]
 
 
-    	# action_id: [self.aiming_for, aiming_for_mult]
+        # action_id: [self.aiming_for, aiming_for_mult]
         self.action_space = { 
                             0: [25, 1],
                             1: [25, 2],
-                            2: [1, 1],
-                            3: [1, 2],
-                            4: [1, 3],
-                            5: [2, 1],
-                            6: [2, 2],
-                            7: [2, 3],
-                            8: [3, 1],
-                            9: [3, 2],
-                            10: [3, 3],
-                            11: [4, 1],
-                            12: [4, 2],
-                            13: [4, 3],
-                            14: [5, 1],
-                            15: [5, 2],
-                            16: [5, 3],
-                            17: [6, 1],
-                            18: [6, 2],
-                            19: [6, 3],
-                            20: [7, 1],
-                            21: [7, 2],
-                            22: [7, 3],
-                            23: [8, 1],
-                            24: [8, 2],
-                            25: [8, 3],
-                            26: [9, 1],
-                            27: [9, 2],
-                            28: [9, 3],
-                            29: [10, 1],
-                            30: [10, 2],
-                            31: [10, 3],
-                            32: [11, 1],
-                            33: [11, 2],
-                            34: [11, 3],
-                            35: [12, 1],
-                            36: [12, 2],
-                            37: [12, 3],
-                            38: [13, 1],
-                            39: [13, 2],
-                            40: [13, 3],
-                            41: [14, 1],
-                            42: [14, 2],
-                            43: [14, 3],
-                            44: [15, 1],
-                            45: [15, 2],
-                            46: [15, 3],
-                            47: [16, 1],
-                            48: [16, 2],
-                            49: [16, 3],
-                            50: [17, 1],
-                            51: [17, 2],
-                            52: [17, 3],
-                            53: [18, 1],
-                            54: [18, 2],
-                            55: [18, 3],
-                            56: [19, 1],
-                            57: [19, 2],
-                            58: [19, 3],
-                            59: [20, 1],
-                            60: [20, 2],
-                            61: [20, 3],
+                            2: [1, 2],
+                            3: [1, 3],
+                            4: [2, 2],
+                            5: [2, 3],
+                            6: [3, 2],
+                            7: [3, 3],
+                            8: [4, 2],
+                            9: [4, 3],
+                            10: [5, 2],
+                            11: [5, 3],
+                            12: [6, 2],
+                            13: [6, 3],
+                            14: [7, 2],
+                            15: [7, 3],
+                            16: [8, 2],
+                            17: [8, 3],
+                            18: [9, 2],
+                            19: [9, 3],
+                            20: [10, 2],
+                            21: [10, 3],
+                            22: [11, 2],
+                            23: [11, 3],
+                            24: [12, 2],
+                            25: [12, 3],
+                            26: [13, 2],
+                            27: [13, 3],
+                            28: [14, 2],
+                            29: [14, 3],
+                            30: [15, 1],
+                            31: [15, 2],
+                            32: [15, 3],
+                            33: [16, 1],
+                            34: [16, 2],
+                            35: [16, 3],
+                            36: [17, 1],
+                            37: [17, 2],
+                            38: [17, 3],
+                            39: [18, 1],
+                            40: [18, 2],
+                            41: [18, 3],
+                            42: [19, 1],
+                            43: [19, 2],
+                            44: [19, 3],
+                            45: [20, 1],
+                            46: [20, 2],
+                            47: [20, 3],
         }
 
 
@@ -150,7 +143,8 @@ class Darts:
             if self.completed[self.player,i] == 0 :
                 aiming_for = 20 - i
                 aiming_for_mult = 3  # single = 1; double = 2; triple = 3
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
+                if self.verbose == 1:
+                    print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
                 return aiming_for, aiming_for_mult
 
             i = i + 1
@@ -159,7 +153,8 @@ class Darts:
         if self.completed[self.player,6] == 0 :
             aiming_for = 25
             aiming_for_mult = 2  # single = 1; double = 2; triple = 3
-            print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
+            if self.verbose == 1:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
             return aiming_for, aiming_for_mult
 
         ##################  NEED TO AIM AT SOMETHNG SCORING ON BEFORE DEFAULTING TO 14; THEN FIX SCORING DECISION (15-20 and <14)!
@@ -168,14 +163,16 @@ class Darts:
         if self.completed[self.player,7] == 0 :
             aiming_for = 20
             aiming_for_mult = 3  # single = 1; double = 2; triple = 3
-            print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
+            if self.verbose == 1:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
             return aiming_for, aiming_for_mult
 
         #Doubles
         if self.completed[self.player,8] == 0 :
             aiming_for = 20
             aiming_for_mult = 2  # single = 1; double = 2; triple = 3
-            print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
+            if self.verbose == 1:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
             return aiming_for, aiming_for_mult
 
         # ALL THE NUMBERS ARE CLOSED FOR THIS PLAYER
@@ -189,25 +186,29 @@ class Darts:
         if scoring_on <= 5 :   ##### RARE BUG EVERY 30-40 GAMES ??scoring_on?? ##################
             aiming_for = 20 - scoring_on
             aiming_for_mult = 3  # single = 1; double = 2; triple = 3
-            print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
+            if self.verbose == 1:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
             return aiming_for, aiming_for_mult
 
         elif scoring_on == 6:
             aiming_for = 25
             aiming_for_mult = 2  # single = 1; double = 2; triple = 3
-            print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
+            if self.verbose == 1:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
             return aiming_for, aiming_for_mult
 
         elif scoring_on == 7 :
             aiming_for = 20
             aiming_for_mult = 3  # single = 1; double = 2; triple = 3
-            print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
+            if self.verbose == 1:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
             return aiming_for, aiming_for_mult
 
         elif scoring_on == 8 :
             aiming_for = 20
             aiming_for_mult = 2  # single = 1; double = 2; triple = 3
-            print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
+            if self.verbose == 1:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
             return aiming_for, aiming_for_mult
 
 
@@ -557,7 +558,7 @@ SCORE     {int(self.current_score[0][0])}\t\t  {int(self.current_score[1][0])}
 LEADING   {'o/' if self.current_score[0][0] > self.current_score[1][0] else '   '}\t\t  {'o/' if self.current_score[0][0] < self.current_score[1][0] else ''}
 DTF       {int(self.darts_to_finish[0][0])}\t\t  {int(self.darts_to_finish[1][0])}
 MPSL      {int(self.current_score[0][0])}-{int(self.current_score[1][0])}/{int(self.max_possible_scoring[0][0])}\t  {int(self.current_score[1][0])}-{int(self.current_score[0][0])}/{int(self.max_possible_scoring[1][0])}
-REWARDS   {self.reward[0][0]:.2f}\t\t  {self.reward[1][0]:.2f}
+REWARDS   {self.reward[0]:.2f}\t\t  {self.reward[1]:.2f}
 DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left
 
 REWARD LOG:
@@ -658,22 +659,26 @@ REWARD LOG:
                 self.reward, self.state_space, self.done = self.step(action = self.aiming_for, action_mult = self.aiming_for_mult, player=self.player)
                 self.log_rewards_full[self.player][i] = self.log_rewards[self.player]
                 
-                print(str(self.dart_score)+"*"+str(self.dart_score_mult)+' ('+self.comment+")")
+                if self.verbose == 1:
+                    print(str(self.dart_score)+"*"+str(self.dart_score_mult)+' ('+self.comment+")")
 
                 if self.game_end[self.player] == 1 :
                     self.turns = self.turns + 1
                     
-                    self.print_main_variables()
+                    if self.verbose == 1:
+                        self.print_main_variables()
                     print(f"\nPlayer {self.player} Wins! Great Game! Turns: "+str(self.turns))
                     sys.exit()
 
-            self.print_main_variables()
+            if self.verbose == 1:
+                self.print_main_variables()
             self.player = 1 - self.player
             self.turns = self.turns + 1
             cont = input("Press ENTER to continue")
 
         if self.turns == 50:
-            self.print_main_variables()
+            if self.verbose == 1:
+                self.print_main_variables()
             print(f"\nNo winner after {str(self.turns)} turns!")
             sys.exit()
 
@@ -717,6 +722,7 @@ REWARD LOG:
     def reset(self):
 
         self.turns = 0
+        self.throw_history = []
 
         # 0-20; 1-19; 2-18; 3-17; 4-16; 5-15; 6-B; 7-T; 8-D
         self.board                  = np.zeros((2, 9))         # number of Xs for each number for each player
@@ -739,19 +745,22 @@ REWARD LOG:
         self.entry_score     = 0
 
         self.done = 0
-        self.reward = np.zeros((2, 1))
+        # self.reward = np.zeros((2, 1))
 
         self.state_space = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
         self.state_space = [item for sublist in [item for sublist in self.state_space for item in sublist] for item in sublist]
+
+        # self.state_space = [self.board[0], self.completed[0], self.scoring[0], self.current_score[0], self.darts_to_finish[0]]
+        # self.state_space = [item for sublist in self.state_space for item in sublist]
         return self.state_space
 
 
 
     def step(self, action, action_mult, player=0):
 
-
         self.player = player
-        
+
+        self.reward = [0.0,0.0]
         self.log_rewards[self.player] = []
 
         self.done = 0
@@ -764,6 +773,9 @@ REWARD LOG:
         self.throw_dart()
         self.dart_score, self.dart_score_mult, self.comment = self.get_dart_score()
 
+        step_result = [self.turns,self.player,self.aiming_for,self.aiming_for_mult,self.dart_score,self.dart_score_mult]
+        self.throw_history.append(step_result) 
+
         previous_num_valid_hits = self.board[self.player].sum()
         previous_num_completed = self.completed[self.player].sum()
         previous_score = self.current_score[self.player]
@@ -775,10 +787,42 @@ REWARD LOG:
         if self.game_end[self.player] == 1:
             self.done = 1
 
+
+        ## position of number in board array
+        board_position = {
+            20: 0,
+            19: 1,
+            18: 2,
+            17: 3,
+            16: 4,
+            15: 5,
+            25: 6
+            ### doubles and tiples are not included here (different combination)
+        }
+
         ## REWARDS
         self.reward[self.player] -= 0.1
         
         self.log_rewards[self.player].append('Throw penalty: -0.1')
+
+        # If it hits a number < 15, but the double or tiple slot is closed, penalize
+        if self.aiming_for < 15:
+            if self.aiming_for_mult == 2:
+                if self.board[0][-1] == 1:    ## Double slot
+                    self.reward[self.player] -= 1
+                    self.log_rewards[self.player].append('Hit closed Double: -1')
+            else:
+                if self.board[0][-2] == 1:    ## Triple slot
+                    self.reward[self.player] -= 1
+                    self.log_rewards[self.player].append('Hit closed Triple: -1')
+
+        else:
+            # if number is already closed, penalize
+            if self.completed[0][board_position[self.aiming_for]] + self.completed[1][board_position[self.aiming_for]] == 2:
+                self.reward[self.player] -= 1
+                self.log_rewards[self.player].append('Hit closed number: -1')
+
+
         
         # If it hits a valid number (15-20 or Bull) and the number is not completed yet
         if previous_num_valid_hits < updated_num_valid_hits:
@@ -787,38 +831,37 @@ REWARD LOG:
 
         if self.darts_to_finish[self.player][0] < self.darts_to_finish[1-self.player][0] and self.turns > 1:
             self.reward[self.player] += 2
-            self.log_rewards[self.player].append('Less darts to finish: +2')
+            self.log_rewards[self.player].append('Less darts to finish: +0.3')
         elif self.darts_to_finish[self.player][0] > self.darts_to_finish[1-self.player][0] and self.turns > 1:
             self.reward[self.player] -= 1
-            self.log_rewards[self.player].append('More darts to finish: -1')
+            self.log_rewards[self.player].append('More darts to finish: -0.3')
 
+        # If it scores, reward it
         if updated_score > previous_score:
-            self.reward[self.player] += previous_score - updated_score / 10
-            self.log_rewards[self.player].append(f'Score increase: +{int(previous_score - updated_score / 10)}')
+            self.reward[self.player] += 1
+            self.log_rewards[self.player].append(f'Score increase: +1')
 
+        # if it completes a number, reward it
         if updated_num_completed > previous_num_completed:
-            self.reward[self.player] += 3*(updated_num_completed - previous_num_completed)
-            self.log_rewards[self.player].append(f'Completed a number: +{int(3*(updated_num_completed - previous_num_completed))}')
+            self.reward[self.player] += 1
+            self.log_rewards[self.player].append(f'Completed a number: +1')
 
+        # if it wins a game, reward it. Otherwise, penalize
         if self.game_end[self.player] == 1:
             self.reward[self.player] += 20
             self.log_rewards[self.player].append('Won the game: +20')
-            self.reward[1-self.player] -= 30
-            self.log_rewards[1-self.player].append('Lost the game: -30')
+            self.reward[1-self.player] -= 20
+            self.log_rewards[1-self.player].append('Lost the game: -20')
 
         
-
-
         self.state_space = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
         self.state_space = [item for sublist in [item for sublist in self.state_space for item in sublist] for item in sublist]
-
-
+        # self.state_space = [self.board[0], self.completed[0], self.scoring[0], self.current_score[0], self.darts_to_finish[0]]
+        # self.state_space = [item for sublist in self.state_space for item in sublist]
 
         return self.reward, self.state_space, self.done      
-
 
 
 if __name__ == "__main__":
     env = Darts()
     env.run_game()
-
