@@ -808,23 +808,23 @@ REWARD LOG:
         # If it hits a number < 15, but the double or tiple slot is closed, penalize
         if self.aiming_for < 15:
             if self.aiming_for_mult == 2:
-                if self.board[0][-1] == 1:    ## Double slot
+                if self.completed[0][-1] == 1:    ## Double slot
                     self.reward[self.player] -= 1
                     self.log_rewards[self.player].append('Hit closed Double: -1')
             else:
-                if self.board[0][-2] == 1:    ## Triple slot
+                if self.completed[0][-2] == 1:    ## Triple slot
                     self.reward[self.player] -= 1
                     self.log_rewards[self.player].append('Hit closed Triple: -1')
 
         else:
             # if number is already closed, penalize
-            if self.completed[0][board_position[self.aiming_for]] + self.completed[1][board_position[self.aiming_for]] == 2:
+            if self.completed[0][board_position[self.aiming_for]] == 1 and self.completed[1][board_position[self.aiming_for]] == 1:
                 self.reward[self.player] -= 1
                 self.log_rewards[self.player].append('Hit closed number: -1')
 
 
-        
-        # If it hits a valid number (15-20 or Bull) and the number is not completed yet
+
+                # If it hits a valid number (15-20 or Bull) and the number is not completed yet
         if previous_num_valid_hits < updated_num_valid_hits:
             self.reward[self.player] += 1
             self.log_rewards[self.player].append('Hit a valid number: +1')

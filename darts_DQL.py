@@ -194,9 +194,9 @@ def train_dqn(episode,verbose=0):
 
 if __name__ == '__main__':
 
-    ep = 50
+    ep = 1000
     loss = train_dqn(ep,verbose=0)
-    plt.plot([i for i in range(ep)], loss)
-    plt.xlabel('episodes')
-    plt.ylabel('reward')
-    plt.show()
+    # plt.plot([i for i in range(ep)], loss)
+    # plt.xlabel('episodes')
+    # plt.ylabel('reward')
+    # plt.show()
