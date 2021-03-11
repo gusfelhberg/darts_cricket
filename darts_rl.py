@@ -721,31 +721,16 @@ REWARD LOG:
 
     def reset(self):
 
+        self.done = 0
         self.turns = 0
-        self.throw_history = []
 
         # 0-20; 1-19; 2-18; 3-17; 4-16; 5-15; 6-B; 7-T; 8-D
         self.board                  = np.zeros((2, 9))         # number of Xs for each number for each player
-        self.current_score          = np.zeros((2, 1))         # current score for each player
-        self.darts_to_finish        = np.zeros((2, 1))         # minimum number of darts needed to finish game
-        self.darts_to_finish        = np.array([[15],[15]])         # minimum number of darts needed to finish game
-        self.max_possible_scoring   = np.zeros((2, 1))         # maximum can score on based on what's open for the oppoenent
-        self.has_fewer_remaining    = np.zeros((2, 1))         # binary for whoever has the fewest darts needed to finish the game - either both 0 (tie) or only one 1
-        self.game_end               = np.zeros((2, 1))         # game over
-
-        # 0-20; 1-19; 2-18; 3-17; 4-16; 5-15; 6-B; 7-T; 8-D
         self.completed          = np.zeros((2, 9))         # binary completed for each number for each player
         self.scoring            = np.zeros((2, 9))         # binary scoring for each number for each player - either both 0 (tie) or only one 1
-        self.has_highest_score  = np.zeros((2, 1))         # binary for whoever has the highest score - either both 0 (tie) or only one 1
-        self.triples            = np.zeros((2, 1))         # binary for completed triples
-        self.doubles            = np.zeros((2, 1))         # binary for completed doubles
-
-        self.dartm           = np.zeros((3))            # multiples Single, Double, Triple
-        self.dartn           = np.zeros((3))            # 1 to 20, or 25
-        self.entry_score     = 0
-
-        self.done = 0
-        # self.reward = np.zeros((2, 1))
+        self.current_score          = np.zeros((2, 1))         # current score for each player
+        self.darts_to_finish        = np.zeros((2, 1))         # minimum number of darts needed to finish game
+        self.max_possible_scoring   = np.zeros((2, 1))         # maximum can score on based on what's open for the oppoenent
 
         self.state_space = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
         self.state_space = [item for sublist in [item for sublist in self.state_space for item in sublist] for item in sublist]

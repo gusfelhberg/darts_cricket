@@ -88,7 +88,6 @@ def train_dqn(episode,verbose=0):
 
     loss = []
     
-
     action_space = len(env.action_space)
     state_space = len(env.state_space)
     max_steps = 50
@@ -96,11 +95,13 @@ def train_dqn(episode,verbose=0):
     agent = DQN(action_space, state_space)
 
     agent_aims_history = []
-    environment_history = []
+
     throw_history = []
     env.verbose = verbose
 
-    for e in range(episode):
+    episode_backup = dict()
+
+    for e in range(1,episode+1):
         
         state = env.reset()
         state = np.reshape(state, (1, state_space))
@@ -147,7 +148,7 @@ def train_dqn(episode,verbose=0):
                 pickle.dump(agent_aims_history, open('agent_aims_history.pkl','wb'))
 
                 if done==1:
-                    print(f"Episode: {e+1}/{episode} \t Agent Reward: {score_agent:.2f} \t Agent Score: {env.current_score[0][0]:.2f} \t P1 Reward: {score_p1:.2f}      P1 Score: {env.current_score[1][0]:.2f}      Winner: Agent")
+                    print(f"Episode: {e}/{episode} \t Agent Reward: {score_agent:.2f} \t Agent Score: {env.current_score[0][0]:.2f} \t P1 Reward: {score_p1:.2f}      P1 Score: {env.current_score[1][0]:.2f}      Winner: Agent")
                     break
             env.turns += 1
 
@@ -171,7 +172,7 @@ def train_dqn(episode,verbose=0):
                     if env.verbose == 1:
                         print(str(env.dart_score)+"*"+str(env.dart_score_mult)+' ('+env.comment+")")
                     if done==1:
-                        print(f"Episode: {e+1}/{episode} \t Agent Reward: {score_agent:.2f} \t Agent Score: {env.current_score[0][0]:.2f} \t P1 Reward: {score_p1:.2f}      P1 Score: {env.current_score[1][0]:.2f}      Winner: P1")
+                        print(f"Episode: {e}/{episode} \t Agent Reward: {score_agent:.2f} \t Agent Score: {env.current_score[0][0]:.2f} \t P1 Reward: {score_p1:.2f}      P1 Score: {env.current_score[1][0]:.2f}      Winner: P1")
                         break   
                 env.turns += 1
                 if env.verbose == 1:
@@ -181,22 +182,34 @@ def train_dqn(episode,verbose=0):
         # if e%10==0:
         # cont = input("Hit ENTER to continue...")    
 
-        loss.append(score_agent)
+        loss.append([e,score_agent,env.current_score[0][0],score_p1,env.current_score[1][0]])
         pickle.dump(loss,open('rewards_per_episodes.pkl','wb'))
-
-        environment_history.append([e,env])
-        pickle.dump(environment_history,open('environment_history.pkl','wb'))
-        pickle.dump(throw_history,open('throw_history.pkl','wb'))
         
+        env_backup = {
+            'board': env.board,
+            'completed': env.completed,
+            'scoring': env.scoring,
+            'game_end': env.game_end,
+            'num_turns': env.turns,
+            'current_score': env.current_score,
+            'rewards_per_episode': loss,
+            'throw_history': throw_history
+        }
 
-    return loss
+        episode_backup[e] = env_backup
+
+        pickle.dump(episode_backup,open('episode_history.pkl','wb'))
+
+        if e % 50 == 0:
+            agent.save_model("models/darts-episode-{}.model".format(e))
+            
+    agent.save_model("models/success.model")
+       
+    
 
 
 if __name__ == '__main__':
 
     ep = 1000
-    loss = train_dqn(ep,verbose=0)
-    # plt.plot([i for i in range(ep)], loss)
-    # plt.xlabel('episodes')
-    # plt.ylabel('reward')
-    # plt.show()
+    train_dqn(ep,verbose=0)
+    
