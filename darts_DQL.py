@@ -14,6 +14,11 @@ import pickle
 env = Darts()
 np.random.seed(0)
 
+import time
+timestr = time.strftime("%Y%m%d-%H%M")
+output_file_verbose = f'logs/output_episodes_verbose_{timestr}.txt'
+
+output_file_episodes = f'logs/output_episodes_summary_{timestr}.txt'
 
 class DQN:
 
@@ -34,8 +39,7 @@ class DQN:
 
     def build_model(self):
         model = Sequential()
-        model.add(Dense(128, input_shape=(self.state_space,), activation='relu'))
-        model.add(Dense(128, activation='relu'))
+        model.add(Dense(64, input_shape=(self.state_space,), activation='relu'))
         model.add(Dense(64, activation='relu'))
         model.add(Dense(self.action_space, activation='linear'))
         model.compile(loss='mse', optimizer=Adam(lr=self.learning_rate))
@@ -96,12 +100,16 @@ def train_dqn(episode,verbose=0):
 
     agent_aims_history = []
 
-    throw_history = []
+    
     env.verbose = verbose
 
     episode_backup = dict()
 
     for e in range(1,episode+1):
+
+        print(f"\n#################################",file=open(output_file_verbose, "a"))
+        print(f"################# EPISODE {e}",file=open(output_file_verbose, "a"))
+        print(f"#################################\n",file=open(output_file_verbose, "a"))
         
         state = env.reset()
         state = np.reshape(state, (1, state_space))
@@ -109,8 +117,10 @@ def train_dqn(episode,verbose=0):
         done = 0
         env.verbose = verbose
 
-        score_agent = 0
-        score_p1 = 0
+        total_reward_agent = 0
+        total_reward_p1 = 0
+
+        throw_history = []
 
         
         env.assign_player_skill(level=4)
@@ -120,20 +130,30 @@ def train_dqn(episode,verbose=0):
             
             if env.verbose == 1:
                 print(f"######## TURN {env.turns} - PLAYER 0")
+                print(f"######## TURN {env.turns} - PLAYER 0",file=open(output_file_verbose, "a"))
+            else:
+                print(f"######## TURN {env.turns} - PLAYER 0",file=open(output_file_verbose, "a"))
+                                    
 
             for throw_num in range(1,4): 
                 
                 action = agent.act(state)
                 if env.verbose == 1:
                     print(f"Aiming At: "+str(env.action_space[action][0])+"*"+str(env.action_space[action][1]), end=' -> ')
+                    print(f"Aiming At: "+str(env.action_space[action][0])+"*"+str(env.action_space[action][1]), end=' -> ',file=open(output_file_verbose, "a"))
+                else:
+                    print(f"Aiming At: "+str(env.action_space[action][0])+"*"+str(env.action_space[action][1]), end=' -> ',file=open(output_file_verbose, "a"))
 
                 reward, next_state, done = env.step(action=env.action_space[action][0],
                                                     action_mult=env.action_space[action][1],
                                                     player=env.player)
                 if env.verbose == 1:
-                    print(str(env.dart_score)+"*"+str(env.dart_score_mult)+' ('+env.comment+")")
+                    print(str(env.dart_score)+"*"+str(env.dart_score_mult)+' ('+env.comment+") - Reward: "+str(np.round(reward[env.player],2)))
+                    print(str(env.dart_score)+"*"+str(env.dart_score_mult)+' ('+env.comment+") - Reward: "+str(np.round(reward[env.player],2)),file=open(output_file_verbose, "a"))
+                else:
+                    print(str(env.dart_score)+"*"+str(env.dart_score_mult)+' ('+env.comment+") - Reward: "+str(np.round(reward[env.player],2)),file=open(output_file_verbose, "a"))                    
 
-                score_agent += reward[0]
+                total_reward_agent += reward[0]
                 next_state = np.reshape(next_state, (1, state_space))
 
                 agent.remember(state, action, reward[0], next_state, done)
@@ -148,9 +168,12 @@ def train_dqn(episode,verbose=0):
                 pickle.dump(agent_aims_history, open('agent_aims_history.pkl','wb'))
 
                 if done==1:
-                    print(f"Episode: {e}/{episode} \t Agent Reward: {score_agent:.2f} \t Agent Score: {env.current_score[0][0]:.2f} \t P1 Reward: {score_p1:.2f}      P1 Score: {env.current_score[1][0]:.2f}      Winner: Agent")
+                    print(f"Episode: {e}/{episode} \t Agent Reward: {total_reward_agent:.2f} \t Agent Score: {env.current_score[0][0]:.2f} \t P1 Reward: {total_reward_p1:.2f}      P1 Score: {env.current_score[1][0]:.2f}      Winner: Agent")
+                    print(f"Episode: {e}/{episode} \t Agent Reward: {total_reward_agent:.2f} \t Agent Score: {env.current_score[0][0]:.2f} \t P1 Reward: {total_reward_p1:.2f}      P1 Score: {env.current_score[1][0]:.2f}      Winner: Agent", file=open(output_file_verbose, "a"))
+                    print(f"Episode: {e}/{episode} \t Agent Reward: {total_reward_agent:.2f} \t Agent Score: {env.current_score[0][0]:.2f} \t P1 Reward: {total_reward_p1:.2f}      P1 Score: {env.current_score[1][0]:.2f}      Winner: Agent", file=open(output_file_episodes, "a"))
                     break
             env.turns += 1
+            # env.print_main_variables()
 
             if done == 0:
 
@@ -158,31 +181,48 @@ def train_dqn(episode,verbose=0):
                 if env.verbose == 1:
                     print()
                     print(f"######## TURN {env.turns} - PLAYER 1")
+                    print('',file=open(output_file_verbose, "a"))
+                    print(f"######## TURN {env.turns} - PLAYER 1",file=open(output_file_verbose, "a"))                    
+                else:
+                    print('',file=open(output_file_verbose, "a"))
+                    print(f"######## TURN {env.turns} - PLAYER 1",file=open(output_file_verbose, "a"))
                 for throw_num in range(1,4): # from 1 to 3
                     env.aiming_for, env.aiming_for_mult = env.decide_target()
 
                     reward, next_state, done = env.step(action=env.aiming_for,
                                                         action_mult=env.aiming_for_mult,
                                                         player=env.player)
-                    score_p1 += reward[1]                                                        
+                    total_reward_p1 += reward[1]                                                        
 
                     step_result = [e,env.turns,env.player,throw_num,env.aiming_for,env.aiming_for_mult,env.dart_score,env.dart_score_mult]
                     throw_history.append(step_result) 
 
                     if env.verbose == 1:
-                        print(str(env.dart_score)+"*"+str(env.dart_score_mult)+' ('+env.comment+")")
+                        print(str(env.dart_score)+"*"+str(env.dart_score_mult)+' ('+env.comment+") - Reward: "+str(np.round(reward[env.player],2)))
+                        print(str(env.dart_score)+"*"+str(env.dart_score_mult)+' ('+env.comment+") - Reward: "+str(np.round(reward[env.player],2)),file=open(output_file_verbose, "a")) 
+                    else:
+                        print(str(env.dart_score)+"*"+str(env.dart_score_mult)+' ('+env.comment+") - Reward: "+str(np.round(reward[env.player],2)),file=open(output_file_verbose, "a"))                                                
                     if done==1:
-                        print(f"Episode: {e}/{episode} \t Agent Reward: {score_agent:.2f} \t Agent Score: {env.current_score[0][0]:.2f} \t P1 Reward: {score_p1:.2f}      P1 Score: {env.current_score[1][0]:.2f}      Winner: P1")
+                        print(f"Episode: {e}/{episode} \t Agent Reward: {total_reward_agent:.2f} \t Agent Score: {env.current_score[0][0]:.2f} \t P1 Reward: {total_reward_p1:.2f}      P1 Score: {env.current_score[1][0]:.2f}      Winner: P1")
+                        print(f"Episode: {e}/{episode} \t Agent Reward: {total_reward_agent:.2f} \t Agent Score: {env.current_score[0][0]:.2f} \t P1 Reward: {total_reward_p1:.2f}      P1 Score: {env.current_score[1][0]:.2f}      Winner: P1", file=open(output_file_verbose, "a"))
+                        print(f"Episode: {e}/{episode} \t Agent Reward: {total_reward_agent:.2f} \t Agent Score: {env.current_score[0][0]:.2f} \t P1 Reward: {total_reward_p1:.2f}      P1 Score: {env.current_score[1][0]:.2f}      Winner: P1", file=open(output_file_episodes, "a"))
+
                         break   
                 env.turns += 1
+                # env.print_main_variables()
                 if env.verbose == 1:
                     print() 
+                    print("",file=open(output_file_verbose, "a"))
+                else:
+                    print("",file=open(output_file_verbose, "a")) 
+
+                
             
 
         # if e%10==0:
         # cont = input("Hit ENTER to continue...")    
 
-        loss.append([e,score_agent,env.current_score[0][0],score_p1,env.current_score[1][0]])
+        loss.append([e,total_reward_agent,env.current_score[0][0],total_reward_p1,env.current_score[1][0]])
         pickle.dump(loss,open('rewards_per_episodes.pkl','wb'))
         
         env_backup = {
@@ -192,7 +232,7 @@ def train_dqn(episode,verbose=0):
             'game_end': env.game_end,
             'num_turns': env.turns,
             'current_score': env.current_score,
-            'rewards_per_episode': loss,
+            'rewards_per_episode': [e,total_reward_agent,env.current_score[0][0],total_reward_p1,env.current_score[1][0]],
             'throw_history': throw_history
         }
 

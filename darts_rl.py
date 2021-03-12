@@ -22,7 +22,11 @@ import sys
 import warnings
 warnings.filterwarnings('ignore')
 
+# from darts_DQL import output_file_verbose
 
+import time
+timestr = time.strftime("%Y%m%d-%H%M")
+output_file_verbose = f'logs/output_episodes_verbose_{timestr}.txt'
 
 class Darts:
 
@@ -55,6 +59,8 @@ class Darts:
         self.done = 0
 
         self.reward = np.zeros((2, 1))
+        self.reward_turn = [0.0,0.0]
+        self.reward_total = [0.0,0.0]
         self.log_rewards = [[],[]]
 
         self.verbose = 1
@@ -70,52 +76,53 @@ class Darts:
         self.action_space = { 
                             0: [25, 1],
                             1: [25, 2],
-                            2: [1, 2],
-                            3: [1, 3],
-                            4: [2, 2],
-                            5: [2, 3],
-                            6: [3, 2],
-                            7: [3, 3],
-                            8: [4, 2],
-                            9: [4, 3],
-                            10: [5, 2],
-                            11: [5, 3],
-                            12: [6, 2],
-                            13: [6, 3],
-                            14: [7, 2],
-                            15: [7, 3],
-                            16: [8, 2],
-                            17: [8, 3],
-                            18: [9, 2],
-                            19: [9, 3],
-                            20: [10, 2],
-                            21: [10, 3],
-                            22: [11, 2],
-                            23: [11, 3],
-                            24: [12, 2],
-                            25: [12, 3],
-                            26: [13, 2],
-                            27: [13, 3],
-                            28: [14, 2],
-                            29: [14, 3],
-                            30: [15, 1],
-                            31: [15, 2],
-                            32: [15, 3],
-                            33: [16, 1],
-                            34: [16, 2],
-                            35: [16, 3],
-                            36: [17, 1],
-                            37: [17, 2],
-                            38: [17, 3],
-                            39: [18, 1],
-                            40: [18, 2],
-                            41: [18, 3],
-                            42: [19, 1],
-                            43: [19, 2],
-                            44: [19, 3],
-                            45: [20, 1],
-                            46: [20, 2],
-                            47: [20, 3],
+                            2: [15, 1],
+                            3: [15, 2],
+                            4: [15, 3],
+                            5: [16, 1],
+                            6: [16, 2],
+                            7: [16, 3],
+                            8: [17, 1],
+                            9: [17, 2],
+                            10: [17, 3],
+                            11: [18, 1],
+                            12: [18, 2],
+                            13: [18, 3],
+                            14: [19, 1],
+                            15: [19, 2],
+                            16: [19, 3],
+                            17: [20, 1],
+                            18: [20, 2],
+                            19: [20, 3],                            
+                            # 2: [1, 2],
+                            # 3: [1, 3],
+                            # 4: [2, 2],
+                            # 5: [2, 3],
+                            # 6: [3, 2],
+                            # 7: [3, 3],
+                            # 8: [4, 2],
+                            # 9: [4, 3],
+                            # 10: [5, 2],
+                            # 11: [5, 3],
+                            # 12: [6, 2],
+                            # 13: [6, 3],
+                            # 14: [7, 2],
+                            # 15: [7, 3],
+                            # 16: [8, 2],
+                            # 17: [8, 3],
+                            # 18: [9, 2],
+                            # 19: [9, 3],
+                            # 20: [10, 2],
+                            # 21: [10, 3],
+                            # 22: [11, 2],
+                            # 23: [11, 3],
+                            # 24: [12, 2],
+                            # 25: [12, 3],
+                            # 26: [13, 2],
+                            # 27: [13, 3],
+                            # 28: [14, 2],
+                            # 29: [14, 3],
+
         }
 
 
@@ -145,6 +152,10 @@ class Darts:
                 aiming_for_mult = 3  # single = 1; double = 2; triple = 3
                 if self.verbose == 1:
                     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
+                    print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+                else:
+                    print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+                    
                 return aiming_for, aiming_for_mult
 
             i = i + 1
@@ -155,6 +166,9 @@ class Darts:
             aiming_for_mult = 2  # single = 1; double = 2; triple = 3
             if self.verbose == 1:
                 print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            else:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
         ##################  NEED TO AIM AT SOMETHNG SCORING ON BEFORE DEFAULTING TO 14; THEN FIX SCORING DECISION (15-20 and <14)!
@@ -165,6 +179,9 @@ class Darts:
             aiming_for_mult = 3  # single = 1; double = 2; triple = 3
             if self.verbose == 1:
                 print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a"))
+            else:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
         #Doubles
@@ -173,6 +190,9 @@ class Darts:
             aiming_for_mult = 2  # single = 1; double = 2; triple = 3
             if self.verbose == 1:
                 print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a"))
+            else:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
         # ALL THE NUMBERS ARE CLOSED FOR THIS PLAYER
@@ -188,6 +208,9 @@ class Darts:
             aiming_for_mult = 3  # single = 1; double = 2; triple = 3
             if self.verbose == 1:
                 print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            else:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
         elif scoring_on == 6:
@@ -195,6 +218,9 @@ class Darts:
             aiming_for_mult = 2  # single = 1; double = 2; triple = 3
             if self.verbose == 1:
                 print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            else:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
         elif scoring_on == 7 :
@@ -202,6 +228,9 @@ class Darts:
             aiming_for_mult = 3  # single = 1; double = 2; triple = 3
             if self.verbose == 1:
                 print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a"))
+            else:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
         elif scoring_on == 8 :
@@ -209,6 +238,9 @@ class Darts:
             aiming_for_mult = 2  # single = 1; double = 2; triple = 3
             if self.verbose == 1:
                 print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            else:
+                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
 
@@ -259,10 +291,10 @@ class Darts:
     # def Score(arrowx,arrowy):
     def get_dart_score(self):
         # Returning values in case of not matching any of the scenarios
-        dart_score = 999
-        dart_score_mult = 0
-        distance = 0
-        comment = "Error??"
+        # dart_score = 999
+        # dart_score_mult = 0
+        # distance = 0
+        # comment = "Error??"
 
         distance = (self.arrow_x ** 2 + self.arrow_y ** 2) ** 0.5  # Pythagoras
 
@@ -283,20 +315,33 @@ class Darts:
             return dart_score, dart_score_mult, comment
 
         ### Wire Shots ###        
+        # wireshotbounce = 0.2
+        # if np.round(distance,0) in [10,20,74,84,134,144]:
+        #     if random() < wireshotbounce:
+        #             dartscore = 0
+        #             dartscoremult = 0
+        #             comment = "Bounced!"
+        #             return dartscore, dartscoremult, comment        
 
-        # Here the original code was using the same return values for two distinct conditions
-        # The new code combines the two conditions, but using an OR
-        else:
-            wireshot_bounce = 0.2
-            if (np.round(distance, 0) in [10, 20, 74, 84, 134, 144]) or \
-               (np.round(angle, 0) in [9, 27, 45, 63, 81, 99, 117, 135, 153, 171, 189, 207, 225, 243, 261, 279, 297, 315, 333, 351]):
-            
-                if random() < wireshot_bounce:
-                    dart_score = 0
-                    dart_score_mult = 0
-                    comment = "Bounced!"
-                    return dart_score, dart_score_mult, comment
+        wireshot_bounce = 0.2
 
+        wire_distances = [10, 20, 74, 84, 134, 144]
+        for dist in wire_distances:
+            if dist - wireshot_bounce <= distance <= dist + wireshot_bounce:
+                dart_score = 0
+                dart_score_mult = 0
+                comment = "Bounced!"
+                return dart_score, dart_score_mult, comment
+    
+        ## wire_angles = [9, 27, 45, 63, 81, 99, 117, 135, 153, 171, 189, 207, 225, 243, 261, 279, 297, 315, 333, 351]
+        wire_angles = [9*(1+2*n) for n in range(0,20)] 
+        if np.round(angle, 0) in wire_angles:
+            if random() < wireshot_bounce:
+                dart_score = 0
+                dart_score_mult = 0
+                comment = "Bounced!"
+                return dart_score, dart_score_mult, comment
+    
 
         if distance < 10:
             dart_score = 25
@@ -345,7 +390,7 @@ class Darts:
             [171, 189, 11],    # 11
             [189, 207,  8],    # 8
             [207, 225, 16],    # 16
-            [255, 243,  7],    # 7
+            [225, 243,  7],    # 7
             [243, 261, 19],    # 19
             [261, 279,  3],    # 3
             [279, 297, 17],    # 17
@@ -368,6 +413,8 @@ class Darts:
             dart_score_mult = 1
 
         return dart_score, dart_score_mult, comment 
+
+
     
     ######################################################
         # WHAT SHOULD I TAKE THIS DART AS? #   DEPENDS ON STRATEGY
@@ -528,7 +575,7 @@ class Darts:
 
 
 
-    def print_main_variables(self):
+    def print_main_variables(self,verbose=0):
         
         def get_string(x):
             if x == 0:
@@ -539,35 +586,89 @@ class Darts:
                 return ('').join(['X' for i in range(int(x))])+' '
             else:
                 return ('').join(['X' for i in range(int(x))])
+        if verbose == 1:
+            print(f'''
+    ------------------------------------------   ---------------   ---------------
+    {'-=' if self.player == 0 else '  '}PLAYER 0{'=-' if self.player == 0 else '  '}        {'-=' if self.player == 1 else '  '}PLAYER 1{'=-' if self.player == 1 else '  '}                COMPLETED          SCORING
+    ------------------------------------------   ---------------   ---------------
+            {get_string(self.board[0][0])}   |  20  |   {get_string(self.board[1][0])}                        {'X' if self.completed[0][0] + self.completed[1][0] == 2 else ' '}             {'yes' if self.scoring[0][0] == 1 else 'no '} -  {'yes' if self.scoring[1][0] == 1 else 'no'}
+            {get_string(self.board[0][1])}   |  19  |   {get_string(self.board[1][1])}                        {'X' if self.completed[0][1] + self.completed[1][1] == 2 else ' '}             {'yes' if self.scoring[0][1] == 1 else 'no '} -  {'yes' if self.scoring[1][1] == 1 else 'no'}
+            {get_string(self.board[0][2])}   |  18  |   {get_string(self.board[1][2])}                        {'X' if self.completed[0][2] + self.completed[1][2] == 2 else ' '}             {'yes' if self.scoring[0][2] == 1 else 'no '} -  {'yes' if self.scoring[1][2] == 1 else 'no'}
+            {get_string(self.board[0][3])}   |  17  |   {get_string(self.board[1][3])}                        {'X' if self.completed[0][3] + self.completed[1][3] == 2 else ' '}             {'yes' if self.scoring[0][3] == 1 else 'no '} -  {'yes' if self.scoring[1][3] == 1 else 'no'}
+            {get_string(self.board[0][4])}   |  16  |   {get_string(self.board[1][4])}                        {'X' if self.completed[0][4] + self.completed[1][4] == 2 else ' '}             {'yes' if self.scoring[0][4] == 1 else 'no '} -  {'yes' if self.scoring[1][4] == 1 else 'no'}
+            {get_string(self.board[0][5])}   |  15  |   {get_string(self.board[1][5])}                        {'X' if self.completed[0][5] + self.completed[1][5] == 2 else ' '}             {'yes' if self.scoring[0][5] == 1 else 'no '} -  {'yes' if self.scoring[1][5] == 1 else 'no'}
+            {get_string(self.board[0][6])}   | BULL |   {get_string(self.board[1][6])}                        {'X' if self.completed[0][6] + self.completed[1][6] == 2 else ' '}             {'yes' if self.scoring[0][6] == 1 else 'no '} -  {'yes' if self.scoring[1][6] == 1 else 'no'}
+            {get_string(self.board[0][7])}   |  x3  |   {get_string(self.board[1][7])}                        {'X' if self.completed[0][7] + self.completed[1][7] == 2 else ' '}             {'yes' if self.scoring[0][7] == 1 else 'no '} -  {'yes' if self.scoring[1][7] == 1 else 'no'}
+            {get_string(self.board[0][8])}   |  x2  |   {get_string(self.board[1][8])}                        {'X' if self.completed[0][8] + self.completed[1][8] == 2 else ' '}             {'yes' if self.scoring[0][8] == 1 else 'no '} -  {'yes' if self.scoring[1][8] == 1 else 'no'}
+    ------------------------------------------   ---------------   ---------------
+    SCORE     {int(self.current_score[0][0])}  \t\t{int(self.current_score[1][0])} 
+    LEADING   {'o/' if self.current_score[0][0] > self.current_score[1][0] else '   '}  \t\t{'o/' if self.current_score[0][0] < self.current_score[1][0] else ''}
+    DTF       {int(self.darts_to_finish[0][0])}  \t\t{int(self.darts_to_finish[1][0])}
+    MPSL      {int(self.current_score[0][0])}-{int(self.current_score[1][0])}/{int(self.max_possible_scoring[0][0])}  \t\t{int(self.current_score[1][0])}-{int(self.current_score[0][0])}/{int(self.max_possible_scoring[1][0])}
+    REWARD    {self.reward_total[0]:.2f}\t\t{self.reward_total[1]:.2f}
+    DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left
+
+    REWARD LOG:
+    {'Throw 1: '+' ; '.join(self.log_rewards_full[self.player][1]) if len(self.log_rewards_full[self.player].keys()) >= 1 else ""}
+    {'Throw 2: '+' ; '.join(self.log_rewards_full[self.player][2]) if len(self.log_rewards_full[self.player].keys()) >= 2 else ""}
+    {'Throw 3: '+' ; '.join(self.log_rewards_full[self.player][3]) if len(self.log_rewards_full[self.player].keys()) >= 3 else ""}
+    ''')
+
+            print(f'''
+    ------------------------------------------   ---------------   ---------------
+    {'-=' if self.player == 0 else '  '}PLAYER 0{'=-' if self.player == 0 else '  '}        {'-=' if self.player == 1 else '  '}PLAYER 1{'=-' if self.player == 1 else '  '}                COMPLETED          SCORING
+    ------------------------------------------   ---------------   ---------------
+            {get_string(self.board[0][0])}   |  20  |   {get_string(self.board[1][0])}                        {'X' if self.completed[0][0] + self.completed[1][0] == 2 else ' '}             {'yes' if self.scoring[0][0] == 1 else 'no '} -  {'yes' if self.scoring[1][0] == 1 else 'no'}
+            {get_string(self.board[0][1])}   |  19  |   {get_string(self.board[1][1])}                        {'X' if self.completed[0][1] + self.completed[1][1] == 2 else ' '}             {'yes' if self.scoring[0][1] == 1 else 'no '} -  {'yes' if self.scoring[1][1] == 1 else 'no'}
+            {get_string(self.board[0][2])}   |  18  |   {get_string(self.board[1][2])}                        {'X' if self.completed[0][2] + self.completed[1][2] == 2 else ' '}             {'yes' if self.scoring[0][2] == 1 else 'no '} -  {'yes' if self.scoring[1][2] == 1 else 'no'}
+            {get_string(self.board[0][3])}   |  17  |   {get_string(self.board[1][3])}                        {'X' if self.completed[0][3] + self.completed[1][3] == 2 else ' '}             {'yes' if self.scoring[0][3] == 1 else 'no '} -  {'yes' if self.scoring[1][3] == 1 else 'no'}
+            {get_string(self.board[0][4])}   |  16  |   {get_string(self.board[1][4])}                        {'X' if self.completed[0][4] + self.completed[1][4] == 2 else ' '}             {'yes' if self.scoring[0][4] == 1 else 'no '} -  {'yes' if self.scoring[1][4] == 1 else 'no'}
+            {get_string(self.board[0][5])}   |  15  |   {get_string(self.board[1][5])}                        {'X' if self.completed[0][5] + self.completed[1][5] == 2 else ' '}             {'yes' if self.scoring[0][5] == 1 else 'no '} -  {'yes' if self.scoring[1][5] == 1 else 'no'}
+            {get_string(self.board[0][6])}   | BULL |   {get_string(self.board[1][6])}                        {'X' if self.completed[0][6] + self.completed[1][6] == 2 else ' '}             {'yes' if self.scoring[0][6] == 1 else 'no '} -  {'yes' if self.scoring[1][6] == 1 else 'no'}
+            {get_string(self.board[0][7])}   |  x3  |   {get_string(self.board[1][7])}                        {'X' if self.completed[0][7] + self.completed[1][7] == 2 else ' '}             {'yes' if self.scoring[0][7] == 1 else 'no '} -  {'yes' if self.scoring[1][7] == 1 else 'no'}
+            {get_string(self.board[0][8])}   |  x2  |   {get_string(self.board[1][8])}                        {'X' if self.completed[0][8] + self.completed[1][8] == 2 else ' '}             {'yes' if self.scoring[0][8] == 1 else 'no '} -  {'yes' if self.scoring[1][8] == 1 else 'no'}
+    ------------------------------------------   ---------------   ---------------
+    SCORE     {int(self.current_score[0][0])}  \t\t{int(self.current_score[1][0])} 
+    LEADING   {'o/' if self.current_score[0][0] > self.current_score[1][0] else '   '}  \t\t{'o/' if self.current_score[0][0] < self.current_score[1][0] else ''}
+    DTF       {int(self.darts_to_finish[0][0])}  \t\t{int(self.darts_to_finish[1][0])}
+    MPSL      {int(self.current_score[0][0])}-{int(self.current_score[1][0])}/{int(self.max_possible_scoring[0][0])}  \t\t{int(self.current_score[1][0])}-{int(self.current_score[0][0])}/{int(self.max_possible_scoring[1][0])}
+    REWARD    {self.reward_total[0]:.2f}\t\t{self.reward_total[1]:.2f}
+    DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left
+
+    REWARD LOG:
+    {'Throw 1: '+' ; '.join(self.log_rewards_full[self.player][1]) if len(self.log_rewards_full[self.player].keys()) >= 1 else ""}
+    {'Throw 2: '+' ; '.join(self.log_rewards_full[self.player][2]) if len(self.log_rewards_full[self.player].keys()) >= 2 else ""}
+    {'Throw 3: '+' ; '.join(self.log_rewards_full[self.player][3]) if len(self.log_rewards_full[self.player].keys()) >= 3 else ""}
+    ''',file=open(output_file_verbose, "a"))
+
+        else:
+            print(f'''
+    ------------------------------------------   ---------------   ---------------
+    {'-=' if self.player == 0 else '  '}PLAYER 0{'=-' if self.player == 0 else '  '}        {'-=' if self.player == 1 else '  '}PLAYER 1{'=-' if self.player == 1 else '  '}                COMPLETED          SCORING
+    ------------------------------------------   ---------------   ---------------
+            {get_string(self.board[0][0])}   |  20  |   {get_string(self.board[1][0])}                        {'X' if self.completed[0][0] + self.completed[1][0] == 2 else ' '}             {'yes' if self.scoring[0][0] == 1 else 'no '} -  {'yes' if self.scoring[1][0] == 1 else 'no'}
+            {get_string(self.board[0][1])}   |  19  |   {get_string(self.board[1][1])}                        {'X' if self.completed[0][1] + self.completed[1][1] == 2 else ' '}             {'yes' if self.scoring[0][1] == 1 else 'no '} -  {'yes' if self.scoring[1][1] == 1 else 'no'}
+            {get_string(self.board[0][2])}   |  18  |   {get_string(self.board[1][2])}                        {'X' if self.completed[0][2] + self.completed[1][2] == 2 else ' '}             {'yes' if self.scoring[0][2] == 1 else 'no '} -  {'yes' if self.scoring[1][2] == 1 else 'no'}
+            {get_string(self.board[0][3])}   |  17  |   {get_string(self.board[1][3])}                        {'X' if self.completed[0][3] + self.completed[1][3] == 2 else ' '}             {'yes' if self.scoring[0][3] == 1 else 'no '} -  {'yes' if self.scoring[1][3] == 1 else 'no'}
+            {get_string(self.board[0][4])}   |  16  |   {get_string(self.board[1][4])}                        {'X' if self.completed[0][4] + self.completed[1][4] == 2 else ' '}             {'yes' if self.scoring[0][4] == 1 else 'no '} -  {'yes' if self.scoring[1][4] == 1 else 'no'}
+            {get_string(self.board[0][5])}   |  15  |   {get_string(self.board[1][5])}                        {'X' if self.completed[0][5] + self.completed[1][5] == 2 else ' '}             {'yes' if self.scoring[0][5] == 1 else 'no '} -  {'yes' if self.scoring[1][5] == 1 else 'no'}
+            {get_string(self.board[0][6])}   | BULL |   {get_string(self.board[1][6])}                        {'X' if self.completed[0][6] + self.completed[1][6] == 2 else ' '}             {'yes' if self.scoring[0][6] == 1 else 'no '} -  {'yes' if self.scoring[1][6] == 1 else 'no'}
+            {get_string(self.board[0][7])}   |  x3  |   {get_string(self.board[1][7])}                        {'X' if self.completed[0][7] + self.completed[1][7] == 2 else ' '}             {'yes' if self.scoring[0][7] == 1 else 'no '} -  {'yes' if self.scoring[1][7] == 1 else 'no'}
+            {get_string(self.board[0][8])}   |  x2  |   {get_string(self.board[1][8])}                        {'X' if self.completed[0][8] + self.completed[1][8] == 2 else ' '}             {'yes' if self.scoring[0][8] == 1 else 'no '} -  {'yes' if self.scoring[1][8] == 1 else 'no'}
+    ------------------------------------------   ---------------   ---------------
+    SCORE     {int(self.current_score[0][0])}  \t\t{int(self.current_score[1][0])} 
+    LEADING   {'o/' if self.current_score[0][0] > self.current_score[1][0] else '   '}  \t\t{'o/' if self.current_score[0][0] < self.current_score[1][0] else ''}
+    DTF       {int(self.darts_to_finish[0][0])}  \t\t{int(self.darts_to_finish[1][0])}
+    MPSL      {int(self.current_score[0][0])}-{int(self.current_score[1][0])}/{int(self.max_possible_scoring[0][0])}  \t\t{int(self.current_score[1][0])}-{int(self.current_score[0][0])}/{int(self.max_possible_scoring[1][0])}
+    REWARD    {self.reward_total[0]:.2f}\t\t{self.reward_total[1]:.2f}
+    DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left
+
+    REWARD LOG:
+    {'Throw 1: '+' ; '.join(self.log_rewards_full[self.player][1]) if len(self.log_rewards_full[self.player].keys()) >= 1 else ""}
+    {'Throw 2: '+' ; '.join(self.log_rewards_full[self.player][2]) if len(self.log_rewards_full[self.player].keys()) >= 2 else ""}
+    {'Throw 3: '+' ; '.join(self.log_rewards_full[self.player][3]) if len(self.log_rewards_full[self.player].keys()) >= 3 else ""}
+    ''',file=open(output_file_verbose, "a"))
         
-        print(f'''
-------------------------------------------   ---------------
-   {'-=' if self.player == 0 else '  '}PLAYER 0{'=-' if self.player == 0 else '  '}        {'-=' if self.player == 1 else '  '}PLAYER 1{'=-' if self.player == 1 else '  '}             COMPLETED
-------------------------------------------   ---------------
-         {get_string(self.board[0][0])}   |  20  |   {get_string(self.board[1][0])}                       {'X' if self.completed[0][0] + self.completed[1][0] == 2 else ''}
-         {get_string(self.board[0][1])}   |  19  |   {get_string(self.board[1][1])}                       {'X' if self.completed[0][1] + self.completed[1][1] == 2 else ''}
-         {get_string(self.board[0][2])}   |  18  |   {get_string(self.board[1][2])}                       {'X' if self.completed[0][2] + self.completed[1][2] == 2 else ''}
-         {get_string(self.board[0][3])}   |  17  |   {get_string(self.board[1][3])}                       {'X' if self.completed[0][3] + self.completed[1][3] == 2 else ''}
-         {get_string(self.board[0][4])}   |  16  |   {get_string(self.board[1][4])}                       {'X' if self.completed[0][4] + self.completed[1][4] == 2 else ''}
-         {get_string(self.board[0][5])}   |  15  |   {get_string(self.board[1][5])}                       {'X' if self.completed[0][5] + self.completed[1][5] == 2 else ''}
-         {get_string(self.board[0][6])}   | BULL |   {get_string(self.board[1][6])}                       {'X' if self.completed[0][6] + self.completed[1][6] == 2 else ''}
-         {get_string(self.board[0][7])}   |  x3  |   {get_string(self.board[1][7])}                       {'X' if self.completed[0][7] + self.completed[1][7] == 2 else ''}
-         {get_string(self.board[0][8])}   |  x2  |   {get_string(self.board[1][8])}                       {'X' if self.completed[0][8] + self.completed[1][8] == 2 else ''}
-------------------------------------------   ---------------
-SCORE     {int(self.current_score[0][0])}\t\t  {int(self.current_score[1][0])} 
-LEADING   {'o/' if self.current_score[0][0] > self.current_score[1][0] else '   '}\t\t  {'o/' if self.current_score[0][0] < self.current_score[1][0] else ''}
-DTF       {int(self.darts_to_finish[0][0])}\t\t  {int(self.darts_to_finish[1][0])}
-MPSL      {int(self.current_score[0][0])}-{int(self.current_score[1][0])}/{int(self.max_possible_scoring[0][0])}\t  {int(self.current_score[1][0])}-{int(self.current_score[0][0])}/{int(self.max_possible_scoring[1][0])}
-REWARDS   {self.reward[0]:.2f}\t\t  {self.reward[1]:.2f}
-DTF -> Darts to finish    MPSL -> Max Poss. Scoring Left
-
-REWARD LOG:
-{'Throw 1: '+' ; '.join(self.log_rewards_full[self.player][1]) if len(self.log_rewards_full[self.player].keys()) >= 1 else ""}
-{'Throw 2: '+' ; '.join(self.log_rewards_full[self.player][2]) if len(self.log_rewards_full[self.player].keys()) >= 2 else ""}
-{'Throw 3: '+' ; '.join(self.log_rewards_full[self.player][3]) if len(self.log_rewards_full[self.player].keys()) >= 3 else ""}
-''')
-
-
 
     ######################################################
                 # WHAT DOES THE DARTBOARD LOOK LIKE? #
@@ -651,6 +752,10 @@ REWARD LOG:
             print(f'######################## PLAYER {str(self.player)} - TURN {str(self.turns+1)} ####################################')
             print('###############################################################################')
             print()
+
+            print('\n###############################################################################',file=open(output_file_verbose, "a"))
+            print(f'######################## PLAYER {str(self.player)} - TURN {str(self.turns+1)} ####################################',file=open(output_file_verbose, "a"))
+            print('###############################################################################\n',file=open(output_file_verbose, "a"))
             
             self.log_rewards_full = [{},{}]
 
@@ -658,27 +763,30 @@ REWARD LOG:
                 self.aiming_for, self.aiming_for_mult = self.decide_target()
                 self.reward, self.state_space, self.done = self.step(action = self.aiming_for, action_mult = self.aiming_for_mult, player=self.player)
                 self.log_rewards_full[self.player][i] = self.log_rewards[self.player]
+                self.reward_total[self.player] += self.reward[self.player]
                 
                 if self.verbose == 1:
-                    print(str(self.dart_score)+"*"+str(self.dart_score_mult)+' ('+self.comment+")")
+                    print(str(self.dart_score)+"*"+str(self.dart_score_mult)+' ('+self.comment+") - Reward: "+str(self.reward[self.player]))
+                    print(str(self.dart_score)+"*"+str(self.dart_score_mult)+' ('+self.comment+") - Reward: "+str(self.reward[self.player]),file=open(output_file_verbose, "a"))
+                else:
+                    print(str(self.dart_score)+"*"+str(self.dart_score_mult)+' ('+self.comment+") - Reward: "+str(self.reward[self.player]),file=open(output_file_verbose, "a")) 
 
                 if self.game_end[self.player] == 1 :
                     self.turns = self.turns + 1
                     
-                    if self.verbose == 1:
-                        self.print_main_variables()
+                    
+                    self.print_main_variables(verbose=self.verbose)
+
                     print(f"\nPlayer {self.player} Wins! Great Game! Turns: "+str(self.turns))
                     sys.exit()
 
-            if self.verbose == 1:
-                self.print_main_variables()
+            self.print_main_variables(verbose=self.verbose)
             self.player = 1 - self.player
             self.turns = self.turns + 1
             cont = input("Press ENTER to continue")
 
         if self.turns == 50:
-            if self.verbose == 1:
-                self.print_main_variables()
+            self.print_main_variables(verbose=self.verbose)
             print(f"\nNo winner after {str(self.turns)} turns!")
             sys.exit()
 
@@ -726,8 +834,8 @@ REWARD LOG:
 
         # 0-20; 1-19; 2-18; 3-17; 4-16; 5-15; 6-B; 7-T; 8-D
         self.board                  = np.zeros((2, 9))         # number of Xs for each number for each player
-        self.completed          = np.zeros((2, 9))         # binary completed for each number for each player
-        self.scoring            = np.zeros((2, 9))         # binary scoring for each number for each player - either both 0 (tie) or only one 1
+        self.completed              = np.zeros((2, 9))         # binary completed for each number for each player
+        self.scoring                = np.zeros((2, 9))         # binary scoring for each number for each player - either both 0 (tie) or only one 1
         self.current_score          = np.zeros((2, 1))         # current score for each player
         self.darts_to_finish        = np.zeros((2, 1))         # minimum number of darts needed to finish game
         self.max_possible_scoring   = np.zeros((2, 1))         # maximum can score on based on what's open for the oppoenent
@@ -735,8 +843,6 @@ REWARD LOG:
         self.state_space = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
         self.state_space = [item for sublist in [item for sublist in self.state_space for item in sublist] for item in sublist]
 
-        # self.state_space = [self.board[0], self.completed[0], self.scoring[0], self.current_score[0], self.darts_to_finish[0]]
-        # self.state_space = [item for sublist in self.state_space for item in sublist]
         return self.state_space
 
 
@@ -746,6 +852,7 @@ REWARD LOG:
         self.player = player
 
         self.reward = [0.0,0.0]
+        
         self.log_rewards[self.player] = []
 
         self.done = 0
@@ -761,17 +868,6 @@ REWARD LOG:
         step_result = [self.turns,self.player,self.aiming_for,self.aiming_for_mult,self.dart_score,self.dart_score_mult]
         self.throw_history.append(step_result) 
 
-        previous_num_valid_hits = self.board[self.player].sum()
-        previous_num_completed = self.completed[self.player].sum()
-        previous_score = self.current_score[self.player]
-        self.update_board()  
-        updated_score = self.current_score[self.player]
-        updated_num_completed = self.completed[self.player].sum()
-        updated_num_valid_hits = self.board[self.player].sum()
-
-        if self.game_end[self.player] == 1:
-            self.done = 1
-
 
         ## position of number in board array
         board_position = {
@@ -785,51 +881,41 @@ REWARD LOG:
             ### doubles and tiples are not included here (different combination)
         }
 
-        ## REWARDS
+        ### REWARDS
+
         self.reward[self.player] -= 0.1
         
         self.log_rewards[self.player].append('Throw penalty: -0.1')
 
-        # If it hits a number < 15, but the double or tiple slot is closed, penalize
-        if self.aiming_for < 15:
-            if self.aiming_for_mult == 2:
-                if self.completed[0][-1] == 1:    ## Double slot
-                    self.reward[self.player] -= 1
-                    self.log_rewards[self.player].append('Hit closed Double: -1')
+
+        # if valid number is already closed, penalize
+        if self.completed[0][board_position[self.aiming_for]] == 1 and self.completed[1][board_position[self.aiming_for]] == 1:
+            self.reward[self.player] -= 3
+            self.log_rewards[self.player].append('Hit closed number: -3')
+        # If valid number is completed (scoring)
+        elif self.completed[0][board_position[self.aiming_for]] == 1:
+            if self.scoring[0][board_position[self.aiming_for]] == 1:
+                self.reward[self.player] += 1
+                self.log_rewards[self.player].append('Hit completed (scoring) number: +1')  
             else:
-                if self.completed[0][-2] == 1:    ## Triple slot
-                    self.reward[self.player] -= 1
-                    self.log_rewards[self.player].append('Hit closed Triple: -1')
-
-        else:
-            # if number is already closed, penalize
-            if self.completed[0][board_position[self.aiming_for]] == 1 and self.completed[1][board_position[self.aiming_for]] == 1:
                 self.reward[self.player] -= 1
-                self.log_rewards[self.player].append('Hit closed number: -1')
-
-
-
-                # If it hits a valid number (15-20 or Bull) and the number is not completed yet
-        if previous_num_valid_hits < updated_num_valid_hits:
+                self.log_rewards[self.player].append('Hit completed (non scoring) number: -1')  
+        else:
             self.reward[self.player] += 1
-            self.log_rewards[self.player].append('Hit a valid number: +1')
+            self.log_rewards[self.player].append('Hit open number: +1')  
 
-        if self.darts_to_finish[self.player][0] < self.darts_to_finish[1-self.player][0] and self.turns > 1:
-            self.reward[self.player] += 2
-            self.log_rewards[self.player].append('Less darts to finish: +0.3')
-        elif self.darts_to_finish[self.player][0] > self.darts_to_finish[1-self.player][0] and self.turns > 1:
-            self.reward[self.player] -= 1
-            self.log_rewards[self.player].append('More darts to finish: -0.3')
+        self.update_board()  
 
-        # If it scores, reward it
-        if updated_score > previous_score:
-            self.reward[self.player] += 1
-            self.log_rewards[self.player].append(f'Score increase: +1')
+        if self.game_end[self.player] == 1:
+            self.done = 1
 
-        # if it completes a number, reward it
-        if updated_num_completed > previous_num_completed:
-            self.reward[self.player] += 1
-            self.log_rewards[self.player].append(f'Completed a number: +1')
+
+        # Check which player has less darts to finish
+        # Note that this is only computed after player 1 throws (after player 0) - avoid any advantage of player 0 for playing first
+        if self.player == 1:
+            if self.darts_to_finish[self.player][0] < self.darts_to_finish[1-self.player][0] and self.turns > 1:
+                self.reward[self.player] += .2
+                self.log_rewards[self.player].append('Less darts to finish: +0.2')
 
         # if it wins a game, reward it. Otherwise, penalize
         if self.game_end[self.player] == 1:
@@ -841,8 +927,6 @@ REWARD LOG:
         
         self.state_space = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
         self.state_space = [item for sublist in [item for sublist in self.state_space for item in sublist] for item in sublist]
-        # self.state_space = [self.board[0], self.completed[0], self.scoring[0], self.current_score[0], self.darts_to_finish[0]]
-        # self.state_space = [item for sublist in self.state_space for item in sublist]
 
         return self.reward, self.state_space, self.done      
 
