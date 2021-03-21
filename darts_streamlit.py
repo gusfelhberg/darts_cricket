@@ -1,31 +1,296 @@
-from Darts_Opponent_Cricket import Accuracy, Throw, Score, Aim, Decide, BoardViz, Skill, GameReset, BoardUpdate
+from streamlit.hashing import _CodeHasher
+from streamlit.report_thread import get_report_ctx
+from streamlit.server.server import Server
+from random import choices
+from string import ascii_letters
 import streamlit as st
-import streamlit.components.v1 as components
-
+import pandas as pd 
+from streamlit_darts_aiming import aim_dart
+import math
 import numpy as np
-# from Darts_Opponent_Cricket import *
-st.set_page_config(layout="wide")
+from random import random
 
+
+from darts_rl import Darts
+# from darts_streamlit import draw_board
+
+       
+# st.set_page_config(layout='wide')
 
 def local_css(file_name):
     with open(file_name) as f:
         st.markdown('<style>{}</style>'.format(f.read()),
                     unsafe_allow_html=True)
+local_css('style.css')
+
+
+def main():
+    
+    state = _get_state()
+    state.throws_history = []
+    # st.set_page_config(layout='wide')
+
+    if state.game is None:
+        state.game = Darts()
+
+    if state.aim_throw_history is None:
+        state.aim_throw_history = []
+
+    st.title('Welcome to the Darts Challenge!')
+    # st.write(f'state.aiming_for: {state.aiming_for}')
+    # st.write(f'state.game.aiming_for: {state.game.aiming_for}')
+    # st.write(state.throw_num)
+    
+
+
+    # st.sidebar.title('Game Config')
+    # if state.player0_name is None:
+    #     player0_name = st.sidebar.text_input('Player 0 Name:')
+    #     player1_name = st.sidebar.text_input('Player 1 Name:')
+    #     players_skills = st.sidebar.number_input('Inform Players Skill (1-5):',4)
+    # if state.player0_name is not None:
+    #     st.sidebar.write(f"Player 0: {state.player0_name}")
+    #     st.sidebar.write(f"Player 1: {state.player1_name}")
+    #     st.sidebar.write(f"Skills: {state.players_skills}")
+    # bt_cols = st.sidebar.beta_columns(2)
+    # if bt_cols[0].button("Save"):
+    #     state.player0_name = player0_name
+    #     state.player1_name = player1_name
+    #     state.players_skills = players_skills
+    # if bt_cols[1].button('Edit'):
+    #     state.player0_name = None
+    #     state.player1_name = None
+    #     state.players_skills = None
+
+
+    # if state.game_start:
+    throw_num = 1
+    max_turns = 50
+    # state.game.player = 0
+    # if state.players_skills is None:
+    #     st.error('Please assign a skill for the players')
+    # else:
+
+
+
+    state.players_skills = 4
+    state.game.assign_player_skill(level=state.players_skills)
+    if state.game.player is None:
+        state.game.player = 0
+    state.wish_to_continue = True
+    if state.throw_num is None:
+        state.throw_num = 1
+
+    if state.game.aiming_for is None and state.wish_to_continue == True:
+
+        # state.wish_to_continue = False
+        st.write('---')
+        st.title(f'Player {state.game.player} - Turn {state.game.turns+1} - Throw # {state.throw_num}')
+        st.subheader('Select your target')
+        radio_aim = st.radio('',['Double Click Board','Select from List'])
+        if radio_aim == 'Double Click Board':
+            x = aim_dart()
+            if x != 0.0:
+                state.aiming_for, state.aiming_for_mult, _ = get_dart_aim(x[0],x[1])
+                st.subheader(f"Aiming at {state.aiming_for} * {state.aiming_for_mult}")
+
+                # if st.button('Confirm',key=99):
+                #     state.aiming_for = get_dart_aim(x[0],x[1])[0]
+                #     state.aiming_for_mult = get_dart_aim(x[0],x[1])[1]
+        else:
+            st.subheader('Select Aiming options')
+            col1,col2 = st.beta_columns(2)
+            aiming_for = col1.selectbox('Aiming For',['Bulls Eye',20,19,18,17,16,15])
+            if aiming_for == 'Bulls Eye':
+                aiming_for_mult = col2.selectbox('Aiming For - Mult',['Single','Double'])
+            else:
+                aiming_for_mult = col2.selectbox('Aiming For - Mult',['Single','Double','Triple'])
+            if aiming_for == 'Bulls Eye':
+                state.aiming_for = 25
+            else:
+                state.aiming_for = aiming_for
+            if aiming_for_mult == 'Single':
+                state.aiming_for_mult = 1
+            elif aiming_for_mult == 'Double':
+                state.aiming_for_mult = 2
+            else:
+                state.aiming_for_mult = 2
+
+
+        if st.button('Throw Dart'):
+            state.confirm = True
+
+        if state.confirm:
+            state.game.aiming_for = int(state.aiming_for)
+            state.game.aiming_for_mult = int(state.aiming_for_mult)
+
+            state.game.reward, state.game.state_space, state.game.done = state.game.step(action = state.game.aiming_for, action_mult = state.game.aiming_for_mult, player=state.game.player)
+            # state.game.log_rewards_full[state.game.player][i] = state.game.log_rewards[state.game.player]
+            # state.game.reward_total[state.game.player] += state.game.reward[state.game.player]
+            
+            state.aim_throw_history.append([state.game.player,state.game.aiming_for,state.game.aiming_for_mult,state.game.dart_score,state.game.dart_score_mult])
+
+            state.throw_num += 1
+            if state.throw_num == 4:
+                state.game.turns += 1
+                state.game.player = 1 - state.game.player
+                state.throw_num = 1
+
+            
+
+            state.game.aiming_for = None
+            state.game.aiming_for_mult = None
+            state.confirm = False
+
+        if state.game.dart_score is not None:
+            st.subheader(str(state.game.dart_score)+"*"+str(state.game.dart_score_mult)+' ('+state.game.comment+")" )
+        draw_board(state.game.board,state.game.current_score,state.game.player)
+
+        if state.game.done == 1:
+            st.balloons()
+            st.title('GAME OVER')
+            st.title(f'Player {state.game.player} Wins!')
+        
+        st.write('---')
+        st.title('Aim x Throw History')
+        st.table(pd.DataFrame(state.aim_throw_history,columns=['Player','Aiming For','Aiming For Mult','Score','Score - Mult']))
+
+
+
+
+
+            
+
+
+    # Mandatory to avoid rollbacks with widgets, must be called at the end of your app
+    state.sync()
+
+
+def get_dart_aim(arrow_x,arrow_y):
+
+        distance = (arrow_x ** 2 + arrow_y ** 2) ** 0.5  # Pythagoras
+
+        angle = math.degrees(math.atan2(arrow_y, arrow_x))
+
+        if angle < 0:
+            angle += 360
+
+        ######################
+        # Miss / Wire / Bull #
+        ######################
+
+        ### Miss self.board###
+        if distance > 144:
+            dart_score = 0
+            dart_score_mult = 0
+            comment = "Backboard!"
+            return dart_score, dart_score_mult, comment
+
+        wireshot_bounce = 0.2
+
+        wire_distances = [10, 20, 74, 84, 134, 144]
+        for dist in wire_distances:
+            if dist - wireshot_bounce <= distance <= dist + wireshot_bounce:
+                dart_score = 0
+                dart_score_mult = 0
+                comment = "Bounced!"
+                return dart_score, dart_score_mult, comment
+    
+        wire_angles = [9*(1+2*n) for n in range(0,20)] 
+        if np.round(angle, 0) in wire_angles:
+            if random() < wireshot_bounce:
+                dart_score = 0
+                dart_score_mult = 0
+                comment = "Bounced!"
+                return dart_score, dart_score_mult, comment
+    
+
+        if distance < 10:
+            dart_score = 25
+            dart_score_mult = 2
+            comment = "Double Bull!"
+            return dart_score, dart_score_mult, comment
+
+        if distance < 20:
+            dart_score = 25
+            dart_score_mult = 1
+            comment = "Single Bull!"
+            return dart_score, dart_score_mult, comment
+
+
+
+        ######################
+                # 20...1 #
+        ######################
+
+        # The original code was repeting the same logic for different angles
+        # To make it simpler, all the combinations of angles (start and end)
+        # and respective score number were combined in the list 'angles_distances_arrays' below
+        # This way, instead of having a similar block of code for each angle range, 
+        # we can have one block of code being used for each element of the array
+
+        # A similar idea applies to the code that compares the distances to select the multiplication factor
+        # The new code adds only one comparison of the distances after the code below.
+
+        triple_distance_limit_lower = 74
+        triple_distance_limit_upper = 84
+        double_distance_limit_lower = 134
+        double_distance_limit_upper = 144
+        
+        angles_distances_array = [
+            #[angle_start, angle_end, score]
+            [0,     9,  6],    # 6 (part 1 of 2)
+            [9,    27, 13],    # 13
+            [27,   45,  4],    # 4
+            [45,   63, 18],    # 18
+            [63,   81,  1],    # 1
+            [81,   99, 20],    # 20
+            [99,  117,  5],    # 5
+            [117, 135, 12],    # 12
+            [135, 153,  9],    # 9
+            [153, 171, 14],    # 14
+            [171, 189, 11],    # 11
+            [189, 207,  8],    # 8
+            [207, 225, 16],    # 16
+            [225, 243,  7],    # 7
+            [243, 261, 19],    # 19
+            [261, 279,  3],    # 3
+            [279, 297, 17],    # 17
+            [297, 315,  2],    # 2
+            [315, 333, 15],    # 15
+            [333, 351, 10],    # 10
+            [351, 361,  6]     # 6 (part 2 of 2)
+        ] 
+
+        for angle_start, angle_end, score in angles_distances_array:
+            if angle_start <= angle < angle_end:
+                    dart_score = score
+                    comment = 'Hit!'
+
+        if triple_distance_limit_lower < distance <= triple_distance_limit_upper:
+            dart_score_mult = 3
+        elif double_distance_limit_lower < distance <= double_distance_limit_upper:
+            dart_score_mult = 2
+        else:
+            dart_score_mult = 1
+
+        return dart_score, dart_score_mult, comment 
 
 
 def get_dart_count_string(num_darts):
     return ''.join([':dart:' for x in range(int(num_darts))])
 
-
-def draw_board(results, current_score, col):
+def draw_board(results, current_score,next_player):
     # results: 2 dimention arrays. Each dimensions contains the number of hits. The last position of the array is the current score
     # Example:
     # results = [[3,2,3,0,0,0,0,0,100],  --> Player 0
     #            [2,3,1,2,0,0,0,0,115]   --> Player 1
     #           ]
 
+
+
     table = f'''
-    | PLAYER 0 |    | PLAYER 1
+    | PLAYER 0 {":raised_hand:" if next_player == 0 else ''} |    | PLAYER 1 {":raised_hand:" if next_player == 1 else ''}
     | -------|----|-------
     | {get_dart_count_string(results[0][0])} | 20 | {get_dart_count_string(results[1][0])} |
     | {get_dart_count_string(results[0][1])} | 19 | {get_dart_count_string(results[1][1])} |
@@ -38,178 +303,87 @@ def draw_board(results, current_score, col):
     | {get_dart_count_string(results[0][8])} | Double | {get_dart_count_string(results[1][8])} |
     |  <span class="scores">{int(current_score[0])}</span>  | <span class="scores">SCORE</span>   |  <span class="scores">{int(current_score[1])}</span>  |
     '''
-    col.markdown('<center>', unsafe_allow_html=True)
-    col.markdown(table, unsafe_allow_html=True)
-    col.markdown('</center>', unsafe_allow_html=True)
+    st.markdown('<center>', unsafe_allow_html=True)
+
+    st.markdown(table, unsafe_allow_html=True)
+    st.markdown('</center>', unsafe_allow_html=True)
 
 
-def new_game(turns, 
-             board, 
-             current_score, 
-             darts_to_finish, 
-             max_poss_scoring, 
-             fewer_remaining, 
-             game_end, 
-             completed, 
-             scoring, 
-             highest_score, 
-             triples, 
-             doubles, 
-             dartm, 
-             dartn, 
-             entryscore):
+class _SessionState:
 
-    player = 0
+    def __init__(self, session, hash_funcs):
+        """Initialize SessionState instance."""
+        self.__dict__["_state"] = {
+            "data": {},
+            "hash": None,
+            "hasher": _CodeHasher(hash_funcs),
+            "is_rerun": False,
+            "session": session,
+        }
+
+    def __call__(self, **kwargs):
+        """Initialize state data once."""
+        for item, value in kwargs.items():
+            if item not in self._state["data"]:
+                self._state["data"][item] = value
+
+    def __getitem__(self, item):
+        """Return a saved state value, None if item is undefined."""
+        return self._state["data"].get(item, None)
+        
+    def __getattr__(self, item):
+        """Return a saved state value, None if item is undefined."""
+        return self._state["data"].get(item, None)
+
+    def __setitem__(self, item, value):
+        """Set state value."""
+        self._state["data"][item] = value
+
+    def __setattr__(self, item, value):
+        """Set state value."""
+        self._state["data"][item] = value
     
-    overall_score=[0,0]
-
-    end_of_game = False
+    def clear(self):
+        """Clear session state and request a rerun."""
+        self._state["data"].clear()
+        self._state["session"].request_rerun()
     
-    cols_title = st.beta_columns([3,1,3])
-    cols_title[0].title('Welcome Mr B. With an Y!')
-    cols_title[2].title('Your Opponent')
-    with cols_title[2].beta_container():
-        components.iframe("https://thispersondoesnotexist.com/",width=150)
+    def sync(self):
+        """Rerun the app with all state values up to date from the beginning to fix rollbacks."""
 
-    while game_end[0, 0] == 0:
-
-        i = 1
-
-        print('')
-        print('##### PLAYER '+str(player))
-
-        if player == 0:
-            st.write('---')
-            cols_player = st.beta_columns([1,1,1,2,1,1,1])
-            cols_player[1].markdown(f'### Turn: {str(turns+1)}', unsafe_allow_html=True)
-            cols_player[5].markdown(f'### Turn: {str(turns+2)}', unsafe_allow_html=True)            
-            cols = st.beta_columns([1,1,1,2,1,1,1])
-
-        for i in range(1, 4):
-            aiming_for, aiming_for_mult = Decide(
-                player, completed, scoring, highest_score, triples, doubles)  # DECISION -> Replace with RL
-
-            # AIM -> Consoder (x,y) policy instead?
-            aiming_arrow_x, aiming_arrow_y = Aim(aiming_for, aiming_for_mult)
-            nowspread = Accuracy(player, generalspread)  # SKILL/FOCUS/LUCK
-            arrow_x, arrow_y = Throw(aiming_arrow_x, aiming_arrow_y, nowspread)  # THROW/LAND
-            dartscore, darts_core_mult, comment = Score(arrow_x, arrow_y)  # DART SCORE
-            
-            # overall_score[player] = overall_score[player] + dartscore * darts_core_mult
-
-
-            board, current_score, game_end, completed, scoring, highest_score, triples, doubles,  darts_to_finish, max_poss_scoring, fewer_remaining = BoardUpdate(
-                board, player, current_score, dartscore, darts_core_mult, highest_score, completed, game_end, darts_to_finish, max_poss_scoring, fewer_remaining, scoring, triples, doubles)  # UPDATE variables after throw
-
-            if player == 0:
-                cols[i-1].markdown("Aiming At: "+str(aiming_for) +"*"+str(aiming_for_mult), unsafe_allow_html=True)
-            else:
-                cols[i+4-1].markdown("Aiming At: "+str(aiming_for) +"*"+str(aiming_for_mult), unsafe_allow_html=True)                
-
-            if player == 0:
-                BoardViz(arrow_x, arrow_y, i, cols[i-1])
-            else:
-                BoardViz(arrow_x, arrow_y, i, cols[i+4-1])
-                
-            print(comment+" "+str(dartscore)+"*"+str(darts_core_mult))
-            if player == 0:
-                cols[i-1].markdown(comment+" "+str(dartscore) + "*"+str(darts_core_mult), unsafe_allow_html=True)
-            else:
-                cols[i+4-1].markdown(comment+" "+str(dartscore) + "*"+str(darts_core_mult), unsafe_allow_html=True)
-                            
-                
-                
-#                 "Single Bull!"
-# "Double Bull!"
-# "Bounced!"
-# "Backboard!"
-# "Hit!"
-            
-            # if player == 0:
-            #     cols[i-1].write(f'Score: {int(current_score[player][0])}')
-            # else:
-            #     cols[i+4-1].write(f'Score: {int(current_score[player][0])}')
-
-
-            if game_end[0, 0] == 1:
-                turns = turns + 1
-                print(board)
-                print(current_score)
-                print(game_end)
-                print("I Win! Great Game! Turns: "+str(turns+1))
-                print("Skill:", generalspread)
-                st.title("I Win! Great Game! Turns: "+str(turns+1))
-                st.title(f"Skill Player 0: {generalspread[0][0]}")
-                st.title(f"Skill Player 1: {generalspread[1][0]}")
-                
-                st.balloons()
-                end_of_game = True
-                break
-
-                # sys.exit()
-
-            if game_end[1, 0] == 1:
-                turns = turns + 1
-                print(board)
-                print(current_score)
-                print(game_end)
-                # BoardViz(arrow_x, arrow_y, i)
-                print("You Win! Great Game! Turns: "+str(turns+1))
-                print("Skill:", generalspread)
-                st.title("You Win! Great Game! Turns: "+str(turns+1))
-                st.title(f"Skill Player 0: {generalspread[0][0]}")
-                st.title(f"Skill Player 1: {generalspread[1][0]}")
-                
-                end_of_game = True
-                break
+        # Ensure to rerun only once to avoid infinite loops
+        # caused by a constantly changing state value at each run.
+        #
+        # Example: state.value += 1
+        if self._state["is_rerun"]:
+            self._state["is_rerun"] = False
         
+        elif self._state["hash"] is not None:
+            if self._state["hash"] != self._state["hasher"].to_bytes(self._state["data"], None):
+                self._state["is_rerun"] = True
+                self._state["session"].request_rerun()
 
-        if player == 1:
-            draw_board(board,current_score,cols[3])
-
-        # st.write(f'')
-        # st.write(f'Darts to Finish: {darts_to_finish[player][0]}')
-        
+        self._state["hash"] = self._state["hasher"].to_bytes(self._state["data"], None)
 
 
-        # st.write('Board: '+str(board[player]))
-        # st.write('Score: '+str(current_score[player]))
-        # if scoring[0][0] > scoring[1][0]:
-        #     st.write('Player 0 is leading')
-        # elif scoring[0][0] < scoring[1][0]:
-        #     st.write('Player 1 is leading')
-        # else:
-        #     st.write('Players with same score')
-        
-        # st.write('Completed: '+str(completed[player]))
-        # st.write('Scoring: '+str(scoring[player]))
-        # st.write('Darts to Finish: '+str(darts_to_finish[player]))
-        # st.write('Fewer remaining: '+str(fewer_remaining[player]))
-        # st.write('Max Poss. Scoring Left: '+str(
-        #     current_score[player])+'-'+str(current_score[1-player])+' / '+str(max_poss_scoring[player]))        
+def _get_session():
+    session_id = get_report_ctx().session_id
+    session_info = Server.get_current()._get_session_info(session_id)
 
-        player = 1 - player
-        turns = turns + 1
-        
-        if end_of_game:
-            break
+    if session_info is None:
+        raise RuntimeError("Couldn't get your Streamlit Session object.")
+    
+    return session_info.session
 
-    # draw_board(board, current_score)
 
+def _get_state(hash_funcs=None):
+    session = _get_session()
+
+    if not hasattr(session, "_custom_session_state"):
+        session._custom_session_state = _SessionState(session, hash_funcs)
+
+    return session._custom_session_state
 
 
 if __name__ == "__main__":
-
-    local_css('style.css')
-    st.title('DARTS CHALLENGE')
-
-    main_bt = st.button('Start New Game')
-
-    if main_bt == True:
-
-        turns, board, current_score, darts_to_finish, max_poss_scoring, fewer_remaining, game_end, completed, scoring, highest_score, triples, doubles, dartm, dartn, entryscore = GameReset()  # RESET variables
-        generalspread = Skill()  # SKILL level
-
-        new_game(turns, board, current_score, darts_to_finish, max_poss_scoring, fewer_remaining,
-                 game_end, completed, scoring, highest_score, triples, doubles, dartm, dartn, entryscore)
-
+    main()
