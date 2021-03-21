@@ -33,91 +33,128 @@ def main():
     if state.game is None:
         state.game = Darts()
 
+    player0_name = ''
+    player1_name = ''
+
     if state.aim_throw_history is None:
         state.aim_throw_history = []
 
     st.title('Welcome to the Darts Challenge!')
-    # st.write(f'state.aiming_for: {state.aiming_for}')
-    # st.write(f'state.game.aiming_for: {state.game.aiming_for}')
-    # st.write(state.throw_num)
+   
+
+
+    st.sidebar.title('Game Config')
+    if state.opponent_type is None:
+        opponent_type = st.sidebar.selectbox('Choose your opponent',['Human','Business Rules','RL Agent (soon)'])
+
+    if state.player0_name is None:
+        player0_name = st.sidebar.text_input('Your Name:')
+        player1_name = st.sidebar.text_input("Your Opponent's Name:")
+        players_skills = st.sidebar.number_input("Player's Skills (1-5):",4)
+    if state.player0_name is not None:
+        st.sidebar.write(f"You: {state.player0_name}")
+        st.sidebar.write(f"Opponent: {state.player1_name} ({state.opponent_type})")
+        st.sidebar.write(f"Skills: {state.players_skills}")
+    bt_cols = st.sidebar.beta_columns(2)
+    if bt_cols[0].button("Save"):
+        state.player0_name = player0_name
+        state.player1_name = player1_name
+        state.players_skills = players_skills
+        state.opponent_type = opponent_type
+        state.game.assign_player_skill(level=state.players_skills)
+    if bt_cols[1].button('Edit'):
+        state.opponent_type = None
+        state.player0_name = None
+        state.player1_name = None
+        state.players_skills = None
+
+
     
-
-
-    # st.sidebar.title('Game Config')
-    # if state.player0_name is None:
-    #     player0_name = st.sidebar.text_input('Player 0 Name:')
-    #     player1_name = st.sidebar.text_input('Player 1 Name:')
-    #     players_skills = st.sidebar.number_input('Inform Players Skill (1-5):',4)
-    # if state.player0_name is not None:
-    #     st.sidebar.write(f"Player 0: {state.player0_name}")
-    #     st.sidebar.write(f"Player 1: {state.player1_name}")
-    #     st.sidebar.write(f"Skills: {state.players_skills}")
-    # bt_cols = st.sidebar.beta_columns(2)
-    # if bt_cols[0].button("Save"):
-    #     state.player0_name = player0_name
-    #     state.player1_name = player1_name
-    #     state.players_skills = players_skills
-    # if bt_cols[1].button('Edit'):
-    #     state.player0_name = None
-    #     state.player1_name = None
-    #     state.players_skills = None
-
-
-    # if state.game_start:
-    throw_num = 1
-    max_turns = 50
-    # state.game.player = 0
-    # if state.players_skills is None:
-    #     st.error('Please assign a skill for the players')
-    # else:
-
-
-
-    state.players_skills = 4
-    state.game.assign_player_skill(level=state.players_skills)
     if state.game.player is None:
         state.game.player = 0
-    state.wish_to_continue = True
+    
     if state.throw_num is None:
         state.throw_num = 1
 
-    if state.game.aiming_for is None and state.wish_to_continue == True:
+    if state.game.aiming_for is None and state.player0_name is not None:
 
-        # state.wish_to_continue = False
+        
         st.write('---')
-        st.title(f'Player {state.game.player} - Turn {state.game.turns+1} - Throw # {state.throw_num}')
-        st.subheader('Select your target')
-        radio_aim = st.radio('',['Double Click Board','Select from List'])
-        if radio_aim == 'Double Click Board':
-            x = aim_dart()
-            if x != 0.0:
-                state.aiming_for, state.aiming_for_mult, _ = get_dart_aim(x[0],x[1])
-                st.subheader(f"Aiming at {state.aiming_for} * {state.aiming_for_mult}")
-                if state.aiming_for not in [15,16,17,18,19,20,25]:
-                    st.warning("Please select a valid number: 15-20 or Bulls Eye (in dev to allow any numbers)")
+        st.title(f'{state.player0_name if state.game.player == 0 else state.player1_name} - Turn {state.game.turns+1} - Throw # {state.throw_num}')
 
-        else:
-            st.subheader('Select Aiming options')
-            col1,col2 = st.beta_columns(2)
-            aiming_for = col1.selectbox('Aiming At',['Bulls Eye',20,19,18,17,16,15])
-            if aiming_for == 'Bulls Eye':
-                aiming_for_mult = col2.selectbox('Aiming At - Mult',['Single','Double'])
+        if state.opponent_type == 'Human':
+
+            st.subheader('Select your target')
+            radio_aim = st.radio('',['Double Click Board','Select from List'])
+            if radio_aim == 'Double Click Board':
+                x = aim_dart()
+                if x != 0.0:
+                    state.aiming_for, state.aiming_for_mult, _ = get_dart_aim(x[0],x[1])
+                    st.subheader(f"{state.player0_name if state.game.player == 0 else state.player1_name} aiming at {state.aiming_for} * {state.aiming_for_mult}")
+                    if state.aiming_for not in [15,16,17,18,19,20,25]:
+                        st.warning("Please select a valid number: 15-20 or Bulls Eye (in dev to allow any numbers)")
+
             else:
-                aiming_for_mult = col2.selectbox('Aiming At - Mult',['Single','Double','Triple'])
-            if aiming_for == 'Bulls Eye':
-                state.aiming_for = 25
+                st.subheader('Select Aiming options')
+                col1,col2 = st.beta_columns(2)
+                aiming_for = col1.selectbox('Aiming At',[20,19,18,17,16,15,'Bulls Eye'])
+                if aiming_for == 'Bulls Eye':
+                    aiming_for_mult = col2.selectbox('Aiming At - Mult',['Single','Double'])
+                else:
+                    aiming_for_mult = col2.selectbox('Aiming At - Mult',['Single','Double','Triple'])
+                if aiming_for == 'Bulls Eye':
+                    state.aiming_for = 25
+                else:
+                    state.aiming_for = aiming_for
+                if aiming_for_mult == 'Single':
+                    state.aiming_for_mult = 1
+                elif aiming_for_mult == 'Double':
+                    state.aiming_for_mult = 2
+                else:
+                    state.aiming_for_mult = 2
+
+        elif state.opponent_type == 'Business Rules':
+
+            if state.game.player == 0:
+
+                st.subheader('Select your target')
+                radio_aim = st.radio('',['Double Click Board','Select from List'])
+                if radio_aim == 'Double Click Board':
+                    x = aim_dart()
+                    if x != 0.0:
+                        state.aiming_for, state.aiming_for_mult, _ = get_dart_aim(x[0],x[1])
+                        st.subheader(f"{state.player0_name if state.game.player == 0 else state.player1_name} aiming at {state.aiming_for} * {state.aiming_for_mult}")
+                        if state.aiming_for not in [15,16,17,18,19,20,25]:
+                            st.warning("Please select a valid number: 15-20 or Bulls Eye (in dev to allow any numbers)")
+
+                else:
+                    st.subheader('Select Aiming options')
+                    col1,col2 = st.beta_columns(2)
+                    aiming_for = col1.selectbox('Aiming At',[20,19,18,17,16,15,'Bulls Eye'])
+                    if aiming_for == 'Bulls Eye':
+                        aiming_for_mult = col2.selectbox('Aiming At - Mult',['Single','Double'])
+                    else:
+                        aiming_for_mult = col2.selectbox('Aiming At - Mult',['Single','Double','Triple'])
+                    if aiming_for == 'Bulls Eye':
+                        state.aiming_for = 25
+                    else:
+                        state.aiming_for = aiming_for
+                    if aiming_for_mult == 'Single':
+                        state.aiming_for_mult = 1
+                    elif aiming_for_mult == 'Double':
+                        state.aiming_for_mult = 2
+                    else:
+                        state.aiming_for_mult = 2
             else:
-                state.aiming_for = aiming_for
-            if aiming_for_mult == 'Single':
-                state.aiming_for_mult = 1
-            elif aiming_for_mult == 'Double':
-                state.aiming_for_mult = 2
-            else:
-                state.aiming_for_mult = 2
+                state.aiming_for, state.aiming_for_mult = state.game.decide_target()
+                st.subheader(f'Player {state.player1_name} has aimed at {state.aiming_for}*{state.aiming_for_mult}')
 
 
         if st.button('Throw Dart'):
-            state.confirm = True
+            if state.aiming_for is None:
+                st.error('Pick a valid target')
+            else:
+                state.confirm = True
 
         if state.confirm:
             state.game.aiming_for = int(state.aiming_for)
@@ -141,7 +178,7 @@ def main():
 
         if state.game.dart_score is not None:
             st.subheader(str(state.game.dart_score)+"*"+str(state.game.dart_score_mult)+' ('+state.game.comment+")" )
-        draw_board(state.game.board,state.game.current_score,state.game.player)
+        draw_board(state.game.board,state.game.current_score,state.game.player,state.player0_name,state.player1_name)
 
         if state.game.done == 1:
             st.balloons()
@@ -153,11 +190,8 @@ def main():
         st.table(pd.DataFrame(state.aim_throw_history,columns=['Player','Aiming At','Aiming At Mult','Score','Score - Mult']))
 
 
-
-
-
-            
-
+    else:
+        st.subheader('Please setup the game config (sidebar)')
 
     # Mandatory to avoid rollbacks with widgets, must be called at the end of your app
     state.sync()
@@ -277,7 +311,7 @@ def get_dart_aim(arrow_x,arrow_y):
 def get_dart_count_string(num_darts):
     return ''.join([':dart:' for x in range(int(num_darts))])
 
-def draw_board(results, current_score,next_player):
+def draw_board(results, current_score,next_player,player0_name,player1_name):
     # results: 2 dimention arrays. Each dimensions contains the number of hits. The last position of the array is the current score
     # Example:
     # results = [[3,2,3,0,0,0,0,0,100],  --> Player 0
@@ -287,7 +321,7 @@ def draw_board(results, current_score,next_player):
 
 
     table = f'''
-    | PLAYER 0 {":raised_hand:" if next_player == 0 else ''} |    | PLAYER 1 {":raised_hand:" if next_player == 1 else ''}
+    | {player0_name} {":raised_hand:" if next_player == 0 else ''} |    | {player1_name} {":raised_hand:" if next_player == 1 else ''}
     | -------|----|-------
     | {get_dart_count_string(results[0][0])} | 20 | {get_dart_count_string(results[1][0])} |
     | {get_dart_count_string(results[0][1])} | 19 | {get_dart_count_string(results[1][1])} |
