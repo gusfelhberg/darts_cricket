@@ -1,1 +1,11 @@
 *.pyc
+logs/*
+models/*
+*old.py
+*.xlsx
+*.ipynb
+*.json
+*.pkl
+throw_history*
+*.ipynb
+rewards_per_episode.pkl

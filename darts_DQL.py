@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 from keras.optimizers import Adam
 import pickle
     
-
 env = Darts()
 np.random.seed(0)
 
