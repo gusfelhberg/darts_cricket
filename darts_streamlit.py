@@ -93,10 +93,9 @@ def main():
             if x != 0.0:
                 state.aiming_for, state.aiming_for_mult, _ = get_dart_aim(x[0],x[1])
                 st.subheader(f"Aiming at {state.aiming_for} * {state.aiming_for_mult}")
+                if state.aiming_for not in [15,16,17,18,19,20,25]:
+                    st.warning("Please select a valid number: 15-20 or Bulls Eye (in dev to allow any numbers)")
 
-                # if st.button('Confirm',key=99):
-                #     state.aiming_for = get_dart_aim(x[0],x[1])[0]
-                #     state.aiming_for_mult = get_dart_aim(x[0],x[1])[1]
         else:
             st.subheader('Select Aiming options')
             col1,col2 = st.beta_columns(2)
