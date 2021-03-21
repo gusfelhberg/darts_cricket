@@ -99,7 +99,7 @@ def main():
         else:
             st.subheader('Select Aiming options')
             col1,col2 = st.beta_columns(2)
-            aiming_for = col1.selectbox('Aiming For',['Bulls Eye',20,19,18,17,16,15])
+            aiming_for = col1.selectbox('Aiming At',['Bulls Eye',20,19,18,17,16,15])
             if aiming_for == 'Bulls Eye':
                 aiming_for_mult = col2.selectbox('Aiming At - Mult',['Single','Double'])
             else:
@@ -124,8 +124,6 @@ def main():
             state.game.aiming_for_mult = int(state.aiming_for_mult)
 
             state.game.reward, state.game.state_space, state.game.done = state.game.step(action = state.game.aiming_for, action_mult = state.game.aiming_for_mult, player=state.game.player)
-            # state.game.log_rewards_full[state.game.player][i] = state.game.log_rewards[state.game.player]
-            # state.game.reward_total[state.game.player] += state.game.reward[state.game.player]
             
             state.aim_throw_history.append([state.game.player,state.game.aiming_for,state.game.aiming_for_mult,state.game.dart_score,state.game.dart_score_mult])
 
