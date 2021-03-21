@@ -156,11 +156,11 @@ class Darts:
             if self.completed[self.player,i] == 0 :
                 aiming_for = 20 - i
                 aiming_for_mult = 3  # single = 1; double = 2; triple = 3
-                if self.verbose == 1:
-                    print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
-                    print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
-                else:
-                    print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+                # if self.verbose == 1:
+                #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
+                #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+                # else:
+                #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
                     
                 return aiming_for, aiming_for_mult
 
@@ -170,11 +170,11 @@ class Darts:
         if self.completed[self.player,6] == 0 :
             aiming_for = 25
             aiming_for_mult = 2  # single = 1; double = 2; triple = 3
-            if self.verbose == 1:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
-            else:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            # if self.verbose == 1:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            # else:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
         ##################  NEED TO AIM AT SOMETHNG SCORING ON BEFORE DEFAULTING TO 14; THEN FIX SCORING DECISION (15-20 and <14)!
@@ -183,22 +183,22 @@ class Darts:
         if self.completed[self.player,7] == 0 :
             aiming_for = 20
             aiming_for_mult = 3  # single = 1; double = 2; triple = 3
-            if self.verbose == 1:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a"))
-            else:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            # if self.verbose == 1:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a"))
+            # else:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
         #Doubles
         if self.completed[self.player,8] == 0 :
             aiming_for = 20
             aiming_for_mult = 2  # single = 1; double = 2; triple = 3
-            if self.verbose == 1:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a"))
-            else:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            # if self.verbose == 1:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ')
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a"))
+            # else:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
         # ALL THE NUMBERS ARE CLOSED FOR THIS PLAYER
@@ -212,41 +212,41 @@ class Darts:
         if scoring_on <= 5 :   ##### RARE BUG EVERY 30-40 GAMES ??scoring_on?? ##################
             aiming_for = 20 - scoring_on
             aiming_for_mult = 3  # single = 1; double = 2; triple = 3
-            if self.verbose == 1:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
-            else:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            # if self.verbose == 1:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            # else:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
         elif scoring_on == 6:
             aiming_for = 25
             aiming_for_mult = 2  # single = 1; double = 2; triple = 3
-            if self.verbose == 1:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
-            else:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            # if self.verbose == 1:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            # else:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
         elif scoring_on == 7 :
             aiming_for = 20
             aiming_for_mult = 3  # single = 1; double = 2; triple = 3
-            if self.verbose == 1:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a"))
-            else:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            # if self.verbose == 1:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a"))
+            # else:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
         elif scoring_on == 8 :
             aiming_for = 20
             aiming_for_mult = 2  # single = 1; double = 2; triple = 3
-            if self.verbose == 1:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
-            else:
-                print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            # if self.verbose == 1:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' (Scoring Only!) -> ')
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
+            # else:
+            #     print("Aiming At: "+str(aiming_for)+"*"+str(aiming_for_mult), end=' -> ',file=open(output_file_verbose, "a")) 
             return aiming_for, aiming_for_mult
 
 
