@@ -101,9 +101,9 @@ def main():
             col1,col2 = st.beta_columns(2)
             aiming_for = col1.selectbox('Aiming For',['Bulls Eye',20,19,18,17,16,15])
             if aiming_for == 'Bulls Eye':
-                aiming_for_mult = col2.selectbox('Aiming For - Mult',['Single','Double'])
+                aiming_for_mult = col2.selectbox('Aiming At - Mult',['Single','Double'])
             else:
-                aiming_for_mult = col2.selectbox('Aiming For - Mult',['Single','Double','Triple'])
+                aiming_for_mult = col2.selectbox('Aiming At - Mult',['Single','Double','Triple'])
             if aiming_for == 'Bulls Eye':
                 state.aiming_for = 25
             else:
@@ -152,7 +152,7 @@ def main():
         
         st.write('---')
         st.title('Aim x Throw History')
-        st.table(pd.DataFrame(state.aim_throw_history,columns=['Player','Aiming For','Aiming For Mult','Score','Score - Mult']))
+        st.table(pd.DataFrame(state.aim_throw_history,columns=['Player','Aiming At','Aiming At Mult','Score','Score - Mult']))
 
 
 
