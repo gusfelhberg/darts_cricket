@@ -1,6 +1,7 @@
 table {
     /* background-color: black; */
-    padding: 5px
+    padding: 5px;
+    
 }
 
 table, th, td {
@@ -9,11 +10,13 @@ table, th, td {
     text-align: center; 
     vertical-align: middle;    
     background-color: black;
+    width: 600px;
 }
 
 .scores {
     font-size: 24px;
     font-weight:700;
+    
 }
 
 
