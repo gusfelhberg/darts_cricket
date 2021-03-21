@@ -9,13 +9,8 @@ from streamlit_darts_aiming import aim_dart
 import math
 import numpy as np
 from random import random
-
-
 from darts_rl import Darts
-# from darts_streamlit import draw_board
 
-       
-# st.set_page_config(layout='wide')
 
 def local_css(file_name):
     with open(file_name) as f:
@@ -28,10 +23,10 @@ def main():
     
     state = _get_state()
     state.throws_history = []
-    # st.set_page_config(layout='wide')
 
     if state.game is None:
         state.game = Darts()
+        state.game.verbose = 0
 
     player0_name = ''
     player1_name = ''
@@ -39,16 +34,17 @@ def main():
     if state.aim_throw_history is None:
         state.aim_throw_history = []
 
-    st.title('Welcome to the Darts Challenge!')
+    st.title(':dart: Welcome to the Darts Challenge :dart:')
    
 
 
     st.sidebar.title('Game Config')
-    if state.opponent_type is None:
-        opponent_type = st.sidebar.selectbox('Choose your opponent',['Human','Business Rules','RL Agent (soon)'])
+
 
     if state.player0_name is None:
         player0_name = st.sidebar.text_input('Your Name:')
+        if state.opponent_type is None:
+            opponent_type = st.sidebar.selectbox('Choose your opponent',['Human','Business Rules','RL Agent (soon)'])
         player1_name = st.sidebar.text_input("Your Opponent's Name:")
         players_skills = st.sidebar.number_input("Player's Skills (1-5):",4)
     if state.player0_name is not None:
@@ -90,6 +86,7 @@ def main():
                 x = aim_dart()
                 if x != 0.0:
                     state.aiming_for, state.aiming_for_mult, _ = get_dart_aim(x[0],x[1])
+
                     st.subheader(f"{state.player0_name if state.game.player == 0 else state.player1_name} aiming at {state.aiming_for} * {state.aiming_for_mult}")
                     if state.aiming_for not in [15,16,17,18,19,20,25]:
                         st.warning("Please select a valid number: 15-20 or Bulls Eye (in dev to allow any numbers)")
@@ -191,7 +188,7 @@ def main():
 
 
     else:
-        st.subheader('Please setup the game config (sidebar)')
+        st.subheader('Please complete the game config (sidebar)')
 
     # Mandatory to avoid rollbacks with widgets, must be called at the end of your app
     state.sync()
