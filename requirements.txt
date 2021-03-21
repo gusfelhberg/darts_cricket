@@ -2,3 +2,4 @@ streamlit==0.76.0
 imageio==2.9.0
 matplotlib==3.3.4
 numpy==1.20.1
+./dependencies/streamlit_darts_aiming-0.1.1-py3-none-any.whl
