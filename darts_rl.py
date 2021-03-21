@@ -56,6 +56,12 @@ class Darts:
         self.dartn           = np.zeros((3))            # 1 to 20, or 25
         self.entry_score     = 0
 
+        self.aiming_for = None
+        self.aiming_for_mult = None
+        self.dart_score = None
+        self.throw_num = 0
+        self.player = 0
+
         self.done = 0
 
         self.reward = np.zeros((2, 1))
@@ -282,6 +288,7 @@ class Darts:
     
         self.arrow_x = np.round(self.aiming_arrow_x + 2*(self.now_spread*(0.5-random())),0)[0]
         self.arrow_y = np.round(self.aiming_arrow_y + 2*(self.now_spread*(0.5-random())),0)[0]
+        print(self.arrow_x,self.arrow_y)
 
 
     ######################################################
@@ -883,9 +890,9 @@ class Darts:
 
         ### REWARDS
 
-        self.reward[self.player] -= 0.1
+        self.reward[self.player] -= 0.5
         
-        self.log_rewards[self.player].append('Throw penalty: -0.1')
+        self.log_rewards[self.player].append('Throw penalty: -0.5')
 
 
         # if valid number is already closed, penalize
@@ -893,21 +900,23 @@ class Darts:
             self.reward[self.player] -= 3
             self.log_rewards[self.player].append('Hit closed number: -3')
         # If valid number is completed (scoring)
-        elif self.completed[0][board_position[self.aiming_for]] == 1:
-            if self.scoring[0][board_position[self.aiming_for]] == 1:
-                self.reward[self.player] += 1
-                self.log_rewards[self.player].append('Hit completed (scoring) number: +1')  
-            else:
-                self.reward[self.player] -= 1
-                self.log_rewards[self.player].append('Hit completed (non scoring) number: -1')  
+        # elif self.completed[0][board_position[self.aiming_for]] == 1:
+        #     if self.scoring[0][board_position[self.aiming_for]] == 1:
+        #         self.reward[self.player] += .1
+        #         self.log_rewards[self.player].append('Hit scoring number: +0.1')  
         else:
             self.reward[self.player] += 1
             self.log_rewards[self.player].append('Hit open number: +1')  
+
+
+
 
         self.update_board()  
 
         if self.game_end[self.player] == 1:
             self.done = 1
+
+
 
 
         # Check which player has less darts to finish
@@ -916,13 +925,16 @@ class Darts:
             if self.darts_to_finish[self.player][0] < self.darts_to_finish[1-self.player][0] and self.turns > 1:
                 self.reward[self.player] += .2
                 self.log_rewards[self.player].append('Less darts to finish: +0.2')
+            else:
+                self.reward[self.player] -= .5
+                self.log_rewards[self.player].append('More darts to finish: -0.5')
 
         # if it wins a game, reward it. Otherwise, penalize
         if self.game_end[self.player] == 1:
-            self.reward[self.player] += 20
-            self.log_rewards[self.player].append('Won the game: +20')
-            self.reward[1-self.player] -= 20
-            self.log_rewards[1-self.player].append('Lost the game: -20')
+            self.reward[self.player] += 30
+            self.log_rewards[self.player].append('Won the game: +30')
+            self.reward[1-self.player] -= 30
+            self.log_rewards[1-self.player].append('Lost the game: -30')
 
         
         self.state_space = [self.board, self.completed, self.scoring, self.current_score, self.darts_to_finish]
